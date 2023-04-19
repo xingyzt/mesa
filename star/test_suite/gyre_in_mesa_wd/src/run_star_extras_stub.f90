@@ -22,97 +22,97 @@
 
 module run_star_extras
 
-  ! Uses
+   ! Uses
 
-  use star_lib
-  use star_def
-  use const_def
-  use math_lib
+   use star_lib
+   use star_def
+   use const_def
+   use math_lib
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
-  include "test_suite_extras_def.inc"
+   implicit none
+   include "test_suite_extras_def.inc"
 
-  ! Procedures
+   ! Procedures
 
 contains
 
-  include "test_suite_extras.inc"
+include "test_suite_extras.inc"
 
-  subroutine extras_controls(id, ierr)
+   subroutine extras_controls(id, ierr)
 
-    integer, intent(in) :: id
-    integer, intent(out) :: ierr
-    type (star_info), pointer :: s
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
 
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
 
-    write(*,*) 'GYRE is not installed: this test will run without '
-    write(*,*) 'calling GYRE and pretend to pass'
+      write(*, *) 'GYRE is not installed: this test will run without '
+      write(*, *) 'calling GYRE and pretend to pass'
 
-    ! Set up hooks
+      ! Set up hooks
 
-    s% extras_startup => extras_startup
-    s% extras_finish_step => extras_finish_step
-    s% extras_after_evolve => extras_after_evolve
+      s% extras_startup => extras_startup
+      s% extras_finish_step => extras_finish_step
+      s% extras_after_evolve => extras_after_evolve
 
-    s% job% warn_run_star_extras =.false.
+      s% job% warn_run_star_extras = .false.
 
-  end subroutine extras_controls
+   end subroutine extras_controls
 
-  !****
+   !****
 
-  subroutine extras_startup(id, restart, ierr)
+   subroutine extras_startup(id, restart, ierr)
 
-    integer, intent(in)  :: id
-    logical, intent(in)  :: restart
-    integer, intent(out) :: ierr
+      integer, intent(in) :: id
+      logical, intent(in) :: restart
+      integer, intent(out) :: ierr
 
-    type (star_info), pointer :: s
+      type (star_info), pointer :: s
 
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
-    call test_suite_startup(s, restart, ierr)
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      call test_suite_startup(s, restart, ierr)
 
-  end subroutine extras_startup
+   end subroutine extras_startup
 
-  !****
+   !****
 
-  integer function extras_finish_step(id)
-    integer, intent(in) :: id
-    integer :: ierr
+   integer function extras_finish_step(id)
+      integer, intent(in) :: id
+      integer :: ierr
 
-    type (star_info), pointer :: s
+      type (star_info), pointer :: s
 
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
 
-    extras_finish_step = keep_going
+      extras_finish_step = keep_going
 
-  end function extras_finish_step
+   end function extras_finish_step
 
-  !****
+   !****
 
-  subroutine extras_after_evolve(id, ierr)
+   subroutine extras_after_evolve(id, ierr)
 
-    integer, intent(in)  :: id
-    integer, intent(out) :: ierr
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
 
-    type (star_info), pointer :: s
+      type (star_info), pointer :: s
 
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
 
-    write(*,*) 'matched target'
+      write(*, *) 'matched target'
 
-    call test_suite_after_evolve(s, ierr)
+      call test_suite_after_evolve(s, ierr)
 
-  end subroutine extras_after_evolve
+   end subroutine extras_after_evolve
 
 end module run_star_extras

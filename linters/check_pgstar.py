@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 
 import check_columns as cc
 
@@ -117,7 +117,6 @@ history_options = cc.CaseInsensitiveSet(
     ]
 )
 
-
 profile_false_positives = cc.CaseInsensitiveSet(["Abundance", "Mixing", "Power"])
 
 history_false_positives = cc.CaseInsensitiveSet(
@@ -153,7 +152,6 @@ history_false_positives = cc.CaseInsensitiveSet(
     ]
 )
 
-
 profile_defaults = cc.get_profile_columns()
 history_defaults = cc.get_history_columns()
 
@@ -169,10 +167,10 @@ def check_pgstar(filename, options, defaults, false_positives):
     for line in lines:
         line = line.strip()
         if (
-            not len(line)
-            or line.startswith("!")
-            or line.startswith("&")
-            or line.startswith("/")
+                not len(line)
+                or line.startswith("!")
+                or line.startswith("&")
+                or line.startswith("/")
         ):
             continue
 
@@ -202,7 +200,7 @@ def check_pgstar(filename, options, defaults, false_positives):
 
 def check_all_pgstars(options, defualts, false_postives):
     for filename in glob.glob(
-        os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
+            os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
     ):
         values = check_pgstar(filename, options, defualts, false_postives)
         if values is None:

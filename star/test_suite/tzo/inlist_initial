@@ -6,16 +6,16 @@
 
 &star_job
 
-   ! begin with a pre-main sequence model
-   create_pre_main_sequence_model = .true.
-   pre_ms_relax_num_steps = 50
+! begin with a pre-main sequence model
+create_pre_main_sequence_model = .true.
+pre_ms_relax_num_steps = 50
 
-   ! save a model at the end of the run
-   save_model_when_terminate = .true.
-   save_model_filename = 'pre_tzo.mod'
+! save a model at the end of the run
+save_model_when_terminate = .true.
+save_model_filename = 'pre_tzo.mod'
 
-   change_initial_net=.true.
-   new_net_name='approx21.net' 
+change_initial_net = .true.
+new_net_name = 'approx21.net'
 
 / ! end of star_job namelist
 
@@ -30,12 +30,12 @@
 
 &controls
 
-   xa_central_lower_limit_species(1) = 'h1'
-   xa_central_lower_limit(1) = 0.5d0
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 0.5d0
 
-   x_integer_ctrl(1) = 1 ! Inlist number
+x_integer_ctrl(1) = 1 ! Inlist number
 
-   use_other_cgrav=.false.
+use_other_cgrav = .false.
 
 / ! end of controls namelist
 

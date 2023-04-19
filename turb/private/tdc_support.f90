@@ -26,18 +26,18 @@
 
 module tdc_support
 
-use const_def
-use num_lib
-use utils_lib
-use auto_diff
-use star_data_def
+   use const_def
+   use num_lib
+   use utils_lib
+   use auto_diff
+   use star_data_def
 
-implicit none
+   implicit none
 
-private
-public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
-         convert, unconvert, safe_tanh, tdc_info, &
-         eval_Af, eval_xis, compute_Q
+   private
+   public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
+      convert, unconvert, safe_tanh, tdc_info, &
+      eval_Af, eval_xis, compute_Q
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
@@ -132,27 +132,27 @@ contains
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
          if (info%report) then
-            write(*,*) 'Q bisection error. Initial Z window does not bracket a solution.'
-            write(*,*) 'Q(Lower Z)',Q_lb%val
-            write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,*) 'tolerance', bracket_tolerance
-            write(*,*) 'Y', Y%val
-            write(*,*) 'dYdZ', Y%d1val1
-            write(*,*) 'exp(Z)', exp(Z%val)
-            write(*,*) 'Z', Z%val
-            write(*,*) 'A0', info%A0%val
-            write(*,*) 'c0', info%c0%val
-            write(*,*) 'L', info%L%val
-            write(*,*) 'L0', info%L0%val
-            write(*,*) 'grada', info%grada%val
-            write(*,*) 'gradL', info%gradL%val
-            write(*,'(A)')
+            write(*, *) 'Q bisection error. Initial Z window does not bracket a solution.'
+            write(*, *) 'Q(Lower Z)', Q_lb%val
+            write(*, *) 'Q(Upper Z)', Q_ub%val
+            write(*, *) 'tolerance', bracket_tolerance
+            write(*, *) 'Y', Y%val
+            write(*, *) 'dYdZ', Y%d1val1
+            write(*, *) 'exp(Z)', exp(Z%val)
+            write(*, *) 'Z', Z%val
+            write(*, *) 'A0', info%A0%val
+            write(*, *) 'c0', info%c0%val
+            write(*, *) 'L', info%L%val
+            write(*, *) 'L0', info%L0%val
+            write(*, *) 'grada', info%grada%val
+            write(*, *) 'gradL', info%gradL%val
+            write(*, '(A)')
          end if
          ierr = 1
          return
       end if
 
-      do iter=1,max_iter
+      do iter = 1, max_iter
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Y = set_Y(Y_is_positive, Z)
 
@@ -226,16 +226,16 @@ contains
       Y = set_Y(.false., lower_bound_Z)
       call compute_Q(info, Y, Q_lb, Af)
       if (Af == 0) then
-         write(*,*) 'Z_lb, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
-         call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
+         write(*, *) 'Z_lb, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
+         call mesa_error(__FILE__, __LINE__, 'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
       end if
       dQdZ_lb = differentiate_1(Q_lb)
 
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q_ub, Af)
       if (Af == 0) then
-         write(*,*) 'Z_ub, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
-         call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
+         write(*, *) 'Z_ub, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
+         call mesa_error(__FILE__, __LINE__, 'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
       end if
       dQdZ_ub = differentiate_1(Q_ub)
 
@@ -244,30 +244,30 @@ contains
       has_root = .true.
       if (dQdZ_lb * dQdZ_ub > 0d0) then
          if (info%report) then
-            write(*,*) 'dQdZ bisection error. Initial Z window does not bracket a solution.'
-            write(*,*) 'Q(Lower Z)',Q_lb%val
-            write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,*) 'dQdZ(Lower Z)',dQdZ_lb%val
-            write(*,*) 'dQdZ(Upper Z)',dQdZ_ub%val
-            write(*,*) 'tolerance', bracket_tolerance
-            write(*,*) 'Y', Y%val
-            write(*,*) 'dYdZ', Y%d1val1
-            write(*,*) 'exp(Z)', exp(Z%val)
-            write(*,*) 'Z', Z%val
-            write(*,*) 'A0', info%A0%val
-            write(*,*) 'c0', info%c0%val
-            write(*,*) 'L', info%L%val
-            write(*,*) 'L0', info%L0%val
-            write(*,*) 'grada', info%grada%val
-            write(*,*) 'gradL', info%gradL%val
-            write(*,'(A)')
+            write(*, *) 'dQdZ bisection error. Initial Z window does not bracket a solution.'
+            write(*, *) 'Q(Lower Z)', Q_lb%val
+            write(*, *) 'Q(Upper Z)', Q_ub%val
+            write(*, *) 'dQdZ(Lower Z)', dQdZ_lb%val
+            write(*, *) 'dQdZ(Upper Z)', dQdZ_ub%val
+            write(*, *) 'tolerance', bracket_tolerance
+            write(*, *) 'Y', Y%val
+            write(*, *) 'dYdZ', Y%d1val1
+            write(*, *) 'exp(Z)', exp(Z%val)
+            write(*, *) 'Z', Z%val
+            write(*, *) 'A0', info%A0%val
+            write(*, *) 'c0', info%c0%val
+            write(*, *) 'L', info%L%val
+            write(*, *) 'L0', info%L0%val
+            write(*, *) 'grada', info%grada%val
+            write(*, *) 'gradL', info%gradL%val
+            write(*, '(A)')
          end if
          has_root = .false.
          return
       end if
 
       ! Bisection search
-      do iter=1,max_iter
+      do iter = 1, max_iter
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Z%d1val1 = 1d0
          Y = set_Y(.false., Z)
@@ -278,7 +278,7 @@ contains
          ! We only ever call this when Y < 0.
          ! In this regime, dQ/dZ can take on either sign, and has at most one stationary point.
 
-         if (info%report) write(*,*) 'Bisecting dQdZ. Z, dQdZ, Z_lb, dQdZ_lb, Z_ub, dQdZ_ub', Z%val, dQdZ%val, lower_bound_Z%val, dQdZ_lb%val, upper_bound_Z%val, dQdZ_ub%val
+         if (info%report) write(*, *) 'Bisecting dQdZ. Z, dQdZ, Z_lb, dQdZ_lb, Z_ub, dQdZ_ub', Z%val, dQdZ%val, lower_bound_Z%val, dQdZ_lb%val, upper_bound_Z%val, dQdZ_ub%val
 
          if (dQdZ > 0d0 .and. dQdZ_ub > 0d0) then
             upper_bound_Z = Z
@@ -297,7 +297,7 @@ contains
          if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
             Z = (upper_bound_Z + lower_bound_Z) / 2d0
             call compute_Q(info, Y, Q, Af)
-            return         
+            return
          end if
       end do
 
@@ -366,7 +366,7 @@ contains
          return
       end if
 
-      do iter=1,max_iter
+      do iter = 1, max_iter
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Y = set_Y(.false., Z)
 
@@ -469,17 +469,17 @@ contains
       ! because we only have a Gamma from MLT in that case.
       ! so when Y < 0 we just use Y_env = Y.
       if (Y > 0) then
-         Y_env = Y * convert(info%Gamma/(1+info%Gamma))
+         Y_env = Y * convert(info%Gamma / (1 + info%Gamma))
       else
          Y_env = Y
       end if
 
       ! Y_env sets the acceleration of blobs.
-      call eval_xis(info, Y_env, xi0, xi1, xi2)          
+      call eval_xis(info, Y_env, xi0, xi1, xi2)
       Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
       ! Y_env sets the convective flux but not the radiative flux.
-      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
+      Q = (info%L - info%L0 * info%gradL) - info%L0 * Y - info%c0 * Af * Y_env
 
    end subroutine compute_Q
 
@@ -508,7 +508,7 @@ contains
    !! @param xi0 Output, the constant term in the convective velocity equation.
    !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
    !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
-   subroutine eval_xis(info, Y, xi0, xi1, xi2) 
+   subroutine eval_xis(info, Y, xi0, xi1, xi2)
       ! eval_xis sets up Y with partial wrt Z
       ! so results come back with partials wrt Z
       type(tdc_info), intent(in) :: info
@@ -516,21 +516,21 @@ contains
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
       type(auto_diff_real_tdc) :: S0, D0, DR0
       type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
-      real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
-      real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
-      real(dp), parameter :: x_ALFAP = 2.d0/3.d0
-      real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
+      real(dp), parameter :: x_ALFAS = (1.d0 / 2.d0) * sqrt_2_div_3
+      real(dp), parameter :: x_CEDE = (8.d0 / 3.d0) * sqrt_2_div_3
+      real(dp), parameter :: x_ALFAP = 2.d0 / 3.d0
+      real(dp), parameter :: x_GAMMAR = 2.d0 * sqrt(3.d0)
 
-      S0 = convert(x_ALFAS*info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
-      S0 = S0*Y
-      D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
-      gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
-      DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
-      Pt0 = info%alpha_TDC_PtdVdt*x_ALFAP*info%rho
-      dVdt = info%dV/info%dt
+      S0 = convert(x_ALFAS * info%mixing_length_alpha * info%Cp * info%T / info%Hp) * info%grada
+      S0 = S0 * Y
+      D0 = convert(info%alpha_TDC_DAMP * x_CEDE / (info%mixing_length_alpha * info%Hp))
+      gammar_div_alfa = info%alpha_TDC_DAMPR * x_GAMMAR / (info%mixing_length_alpha * info%Hp)
+      DR0 = convert(4d0 * boltz_sigma * pow2(gammar_div_alfa) * pow3(info%T) / (pow2(info%rho) * info%Cp * info%kap))
+      Pt0 = info%alpha_TDC_PtdVdt * x_ALFAP * info%rho
+      dVdt = info%dV / info%dt
 
       xi0 = S0
-      xi1 = -(DR0 + convert(Pt0*dVdt))
+      xi1 = -(DR0 + convert(Pt0 * dVdt))
       xi2 = -D0
    end subroutine eval_xis
 
@@ -563,10 +563,10 @@ contains
    !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
    !! @param Af Output, the convection speed at the end of the step (cm/s)
    function eval_Af(dt, A0, xi0, xi1, xi2) result(Af)
-      real(dp), intent(in) :: dt    
+      real(dp), intent(in) :: dt
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, lk 
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, lk
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 
@@ -575,7 +575,7 @@ contains
          Jt4 = 0.25d0 * dt * J
          num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
-         Af = num / den 
+         Af = num / den
          if (Af < 0d0) then
             Af = -Af
          end if
@@ -596,20 +596,20 @@ contains
          if (root > pi) then
             root = root - pi
          else if (root < -pi) then
-            root = root + 2d0*pi
+            root = root + 2d0 * pi
          else if (root < 0d0) then
             root = root + pi
          end if
 
          if (Jt4 < root) then
-            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J)) 
+            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J))
             den = 2d0 * xi2
             Af = num / den
          else
             Af = 0d0
          end if
       else ! if (J2 == 0d0) then         
-         Af = A0            
+         Af = A0
       end if
 
    end function eval_Af

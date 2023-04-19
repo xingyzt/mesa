@@ -25,179 +25,179 @@
 
 module pulse_gr1d
 
-  ! Uses
+   ! Uses
 
-  use star_private_def
-  use const_def
-  use utils_lib
+   use star_private_def
+   use const_def
+   use utils_lib
 
-  use pulse_utils
+   use pulse_utils
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
+   private
 
-  public :: get_gr1d_data
-  public :: write_gr1d_data
+   public :: get_gr1d_data
+   public :: write_gr1d_data
 
 contains
 
-  subroutine get_gr1d_data (id, global_data, point_data, ierr)
+   subroutine get_gr1d_data (id, global_data, point_data, ierr)
 
-    integer, intent(in)                :: id
-    real(dp), allocatable, intent(out) :: global_data(:)
-    real(dp), allocatable, intent(out) :: point_data(:,:)
-    integer, intent(out)               :: ierr
+      integer, intent(in) :: id
+      real(dp), allocatable, intent(out) :: global_data(:)
+      real(dp), allocatable, intent(out) :: point_data(:, :)
+      integer, intent(out) :: ierr
 
-    type(star_info), pointer :: s
-    integer                  :: nn
-    integer                  :: j
-    integer                  :: k
-    integer                  :: sg
+      type(star_info), pointer :: s
+      integer :: nn
+      integer :: j
+      integer :: k
+      integer :: sg
 
-    ! Get model data for GR1D output
+      ! Get model data for GR1D output
 
-    call get_star_ptr(id, s, ierr)
-    if (ierr /= 0) then
-       write(*,*) 'bad star id for get_gyre_data'
-       return
-    end if
+      call get_star_ptr(id, s, ierr)
+      if (ierr /= 0) then
+         write(*, *) 'bad star id for get_gyre_data'
+         return
+      end if
 
-    ! Determine data dimensiones
+      ! Determine data dimensiones
 
-    nn = s%nz
+      nn = s%nz
 
-    ! Store global data
+      ! Store global data
 
-    allocate(global_data(0))
+      allocate(global_data(0))
 
-    ! Store point data
+      ! Store point data
 
-    allocate(point_data(7,nn))
+      allocate(point_data(7, nn))
 
-    j = 1
+      j = 1
 
-    ! Envelope
+      ! Envelope
 
-    sg = 1
+      sg = 1
 
-    env_loop : do k = s%nz, 1, -1
+      env_loop : do k = s%nz, 1, -1
 
-       call store_point_data_env(j, k)
+         call store_point_data_env(j, k)
 
-    end do env_loop
+      end do env_loop
 
-    ! Finish
-
-    return
-
-  contains
-
-    subroutine store_point_data_env (j, k)
-
-      integer, intent(in) :: j
-      integer, intent(in) :: k
-
-      ! Store data associated with envelope face k into the point_data
-      ! array at position j
-
-      associate ( &
-           m => point_data(1,j), &
-           r => point_data(2,j), &
-           T => point_data(3,j), &
-           rho => point_data(4,j), &
-           v => point_data(5,j), &
-           ye => point_data(6,j), &
-           omega => point_data(7,j))
-
-        m = s% m(k) - 0.5d0*s% dm(k)
-
-        T = s%T(k)
-        rho = s%rho(k)
-        ye = s%ye(k)
-
-        if (s% rotation_flag) then
-           if (k == s%nz) then
-              omega = s%omega(k)
-           else
-              omega = 0.5d0*(s%omega(k) + s%omega(k+1))
-           end if
-        else
-           omega = 0d0
-        endif
-
-        if (k == s% nz) then
-           r = 0.5d0*s%r(k)
-           v = 0.5d0*s%v(k)
-        else
-           r = 0.5d0*(s%r(k) + s%r(k+1))
-           v = 0.5d0*(s%v(k) + s%v(k+1))
-        end if
-
-      end associate
       ! Finish
 
       return
 
-    end subroutine store_point_data_env
+   contains
 
-  end subroutine get_gr1d_data
+      subroutine store_point_data_env (j, k)
 
-  !****
+         integer, intent(in) :: j
+         integer, intent(in) :: k
 
-  subroutine write_gr1d_data (id, filename, global_data, point_data, ierr)
+         ! Store data associated with envelope face k into the point_data
+         ! array at position j
 
-    integer, intent(in)      :: id
-    character(*), intent(in) :: filename
-    real(dp), intent(in)     :: global_data(:)
-    real(dp), intent(in)     :: point_data(:,:)
-    integer, intent(out)     :: ierr
+         associate (&
+            m => point_data(1, j), &
+            r => point_data(2, j), &
+            T => point_data(3, j), &
+            rho => point_data(4, j), &
+            v => point_data(5, j), &
+            ye => point_data(6, j), &
+            omega => point_data(7, j))
 
-    type(star_info), pointer :: s
-    integer                  :: iounit
-    integer                  :: nn
-    integer                  :: j
+            m = s% m(k) - 0.5d0 * s% dm(k)
 
-    ! Write GR1D data to file
+            T = s%T(k)
+            rho = s%rho(k)
+            ye = s%ye(k)
 
-    call get_star_ptr(id, s, ierr)
-    if (ierr /= 0) then
-       write(*,*) 'bad star id for write_gr1d_data'
-       return
-    end if
+            if (s% rotation_flag) then
+               if (k == s%nz) then
+                  omega = s%omega(k)
+               else
+                  omega = 0.5d0 * (s%omega(k) + s%omega(k + 1))
+               end if
+            else
+               omega = 0d0
+            endif
 
-    ! Open the file
+            if (k == s% nz) then
+               r = 0.5d0 * s%r(k)
+               v = 0.5d0 * s%v(k)
+            else
+               r = 0.5d0 * (s%r(k) + s%r(k + 1))
+               v = 0.5d0 * (s%v(k) + s%v(k + 1))
+            end if
 
-    open(newunit=iounit, file=TRIM(filename), status='REPLACE', iostat=ierr)
-    if (ierr /= 0) then
-       write(*,*) 'failed to open '//TRIM(filename)
-       return
-    end if
+         end associate
+         ! Finish
 
-    ! Write the data
+         return
 
-    nn = SIZE(point_data, 2)
+      end subroutine store_point_data_env
 
-    write(iounit, 100) nn
-100 format(I6)
+   end subroutine get_gr1d_data
 
-    do j = 1, nn
-       write(iounit, 100) j, point_data(:,j)
-110    format(I6,1P,99E20.10)
-    end do
+   !****
 
-    ! Close the file
-    
-    close(iounit)
+   subroutine write_gr1d_data (id, filename, global_data, point_data, ierr)
 
-    ! Finish
+      integer, intent(in) :: id
+      character(*), intent(in) :: filename
+      real(dp), intent(in) :: global_data(:)
+      real(dp), intent(in) :: point_data(:, :)
+      integer, intent(out) :: ierr
 
-    return
+      type(star_info), pointer :: s
+      integer :: iounit
+      integer :: nn
+      integer :: j
 
-  end subroutine write_gr1d_data
+      ! Write GR1D data to file
+
+      call get_star_ptr(id, s, ierr)
+      if (ierr /= 0) then
+         write(*, *) 'bad star id for write_gr1d_data'
+         return
+      end if
+
+      ! Open the file
+
+      open(newunit = iounit, file = TRIM(filename), status = 'REPLACE', iostat = ierr)
+      if (ierr /= 0) then
+         write(*, *) 'failed to open ' // TRIM(filename)
+         return
+      end if
+
+      ! Write the data
+
+      nn = SIZE(point_data, 2)
+
+      write(iounit, 100) nn
+      100 format(I6)
+
+      do j = 1, nn
+         write(iounit, 100) j, point_data(:, j)
+         110    format(I6, 1P, 99E20.10)
+      end do
+
+      ! Close the file
+
+      close(iounit)
+
+      ! Finish
+
+      return
+
+   end subroutine write_gr1d_data
 
 end module pulse_gr1d

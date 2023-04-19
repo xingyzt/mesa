@@ -22,31 +22,31 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_close_gaps
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_close_gaps = .true.
-      ! procedure pointer: s% other_close_gaps => my_routine
-      ! This also requires the control remove_mixing_glitches = .true. 
+module other_close_gaps
 
-      use star_def
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_close_gaps = .true.
+   ! procedure pointer: s% other_close_gaps => my_routine
+   ! This also requires the control remove_mixing_glitches = .true.
 
-      implicit none
-      
-      contains
-      
-      
-      subroutine null_other_close_gaps(id, mix_type, min_gap, ierr)
-         integer, intent(in) :: id
-         integer, intent(in) :: mix_type
-         real(dp), intent(in) :: min_gap
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_other_close_gaps
+   use star_def
+
+   implicit none
+
+contains
 
 
-      end module other_close_gaps
+   subroutine null_other_close_gaps(id, mix_type, min_gap, ierr)
+      integer, intent(in) :: id
+      integer, intent(in) :: mix_type
+      real(dp), intent(in) :: min_gap
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine null_other_close_gaps
+
+
+end module other_close_gaps
       
       
       

@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import os
-import re
-import glob
-from collections.abc import MutableSet
 import functools
 import operator
-
+import os
+import re
+from collections.abc import MutableSet
 
 MESA_DIR = "../"
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
+
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
@@ -61,6 +60,7 @@ def get_columns(filename, regexp):
             matches.append(m.group(1))
     return CaseInsensitiveSet(matches)
 
+
 def print_section(header):
     """Display output section header"""
     print(f"\n\n*** {header} ***\n")
@@ -86,8 +86,9 @@ def get_defaults(filename):
 
     return get_columns(filename, regexp)
 
+
 def load_file(filename):
-    with open(os.path.join(MESA_DIR, filename),"r") as f:
+    with open(os.path.join(MESA_DIR, filename), "r") as f:
         lines = f.readlines()
 
     return lines
@@ -98,32 +99,33 @@ def get_inc(filename):
     lines = load_file(filename)
 
     # Remove line continutaion characters
-    lines = [i.replace("&","").strip() for i in lines if i]
+    lines = [i.replace("&", "").strip() for i in lines if i]
 
     # Remove type defintion (i.e real(dp) :: x) leaves just x
     # as well as anything that starstwith a comment or has a comment embeded in it
-    for idl,line in enumerate(lines):
+    for idl, line in enumerate(lines):
         if "::" in line:
             lines[idl] = line.split("::")[1].strip()
 
-    lines = [i.split(",") for i in lines  if i]
+    lines = [i.split(",") for i in lines if i]
 
     # Flatten list of lists
     lines = functools.reduce(operator.iconcat, lines, [])
 
     # Remove array sizes from variables
-    lines  = [line.split("(")[0] for line in lines if line]
-    
+    lines = [line.split("(")[0] for line in lines if line]
+
     # Remove comments
     lines = [line.split("!")[0] for line in lines if line]
 
     # Remove = x 
-    lines  = [line.split("=")[0] for line in lines if line]
+    lines = [line.split("=")[0] for line in lines if line]
 
     # Remove remaining empty strings
-    lines  = [line.strip() for line in lines if line]
+    lines = [line.strip() for line in lines if line]
 
     return CaseInsensitiveSet(lines)
+
 
 def check_io(filename, dt, var):
     # Checks that we have both dt% variable = variable and variable = dt% variable
@@ -142,14 +144,14 @@ def check_io(filename, dt, var):
 
     match_m1 = False
     match_m2 = False
-    r1=[]
-    r2=[]
+    r1 = []
+    r2 = []
 
     for line in lines:
         if rc1.match(line):
-            match_m1=True
+            match_m1 = True
         if rc2.match(line):
-            match_m2=True
+            match_m2 = True
 
     if not match_m1:
         r1.append(m1)
@@ -157,10 +159,10 @@ def check_io(filename, dt, var):
     if not match_m2:
         r2.append(m2)
 
-    return r1,r2
+    return r1, r2
+
 
 def run_checks(inc_file, defaults_file, io_file, dt, module):
-
     print_section(module)
     cinc = get_inc(inc_file)
 
@@ -181,8 +183,6 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
         f"{module}_namelist_name",
     )
 
-
-
     print_section("Things in include but not defaults")
 
     print_options(cinc - cdef - false_positives)
@@ -195,8 +195,8 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
 
     m1 = []
     m2 = []
-    for i in cdef- false_positives:
-        r1,r2=check_io(io_file, dt,i)
+    for i in cdef - false_positives:
+        r1, r2 = check_io(io_file, dt, i)
         m1.extend(r1)
         m2.extend(r2)
 
@@ -210,9 +210,14 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
 
     print()
 
-if __name__ == "__main__":
-    run_checks("star_data/private/star_controls.inc","star/defaults/controls.defaults","star/private/ctrls_io.f90","s","controls")
-    run_checks("star_data/private/star_controls_dev.inc","star/defaults/controls_dev.defaults","star/private/ctrls_io.f90","s","controls")
 
-    run_checks("star_data/private/star_job_controls.inc","star/defaults/star_job.defaults","star/private/star_job_ctrls_io.f90","s% job","star_job")
-    run_checks("star_data/private/star_job_controls_dev.inc","star/defaults/star_job_dev.defaults","star/private/star_job_ctrls_io.f90","s% job","star_job")
+if __name__ == "__main__":
+    run_checks("star_data/private/star_controls.inc", "star/defaults/controls.defaults",
+               "star/private/ctrls_io.f90", "s", "controls")
+    run_checks("star_data/private/star_controls_dev.inc", "star/defaults/controls_dev.defaults",
+               "star/private/ctrls_io.f90", "s", "controls")
+
+    run_checks("star_data/private/star_job_controls.inc", "star/defaults/star_job.defaults",
+               "star/private/star_job_ctrls_io.f90", "s% job", "star_job")
+    run_checks("star_data/private/star_job_controls_dev.inc", "star/defaults/star_job_dev.defaults",
+               "star/private/star_job_ctrls_io.f90", "s% job", "star_job")

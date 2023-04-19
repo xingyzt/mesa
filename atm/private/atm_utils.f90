@@ -26,211 +26,211 @@
 
 module atm_utils
 
-  ! Uses
+   ! Uses
 
-  use const_def
-  use math_lib
+   use const_def
+   use math_lib
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Parameter definitions
+   ! Parameter definitions
 
-  integer, parameter :: E2_NPAIRS = 571
+   integer, parameter :: E2_NPAIRS = 571
 
-  ! Module variables
+   ! Module variables
 
-  real(dp), target, save  :: E2_x(E2_NPAIRS)
-  real(dp), save          :: E2_pairs(2*E2_NPAIRS)
-  real(dp), target, save  :: E2_f_ary(4*E2_NPAIRS)
-  real(dp), pointer, save :: E2_f1(:), E2_f(:,:)
-  logical, save           :: have_E2_interpolant = .false.
+   real(dp), target, save :: E2_x(E2_NPAIRS)
+   real(dp), save :: E2_pairs(2 * E2_NPAIRS)
+   real(dp), target, save :: E2_f_ary(4 * E2_NPAIRS)
+   real(dp), pointer, save :: E2_f1(:), E2_f(:, :)
+   logical, save :: have_E2_interpolant = .false.
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
+   private
 
-  public :: init
-  public :: shutdown
-  public :: eval_Teff_g
-  public :: eval_Paczynski_gradr
-  public :: eval_E2
+   public :: init
+   public :: shutdown
+   public :: eval_Teff_g
+   public :: eval_Paczynski_gradr
+   public :: eval_E2
 
-  ! Procedures
+   ! Procedures
 
 contains
 
-  subroutine init(use_cache, ierr)
+   subroutine init(use_cache, ierr)
 
-    use table_atm, only: table_atm_init
+      use table_atm, only : table_atm_init
 
-    logical, intent(in) :: use_cache
-    integer, intent(out) :: ierr
+      logical, intent(in) :: use_cache
+      integer, intent(out) :: ierr
 
-    ierr = 0
+      ierr = 0
 
-    E2_f1 => E2_f_ary
-    E2_f(1:4,1:E2_NPAIRS) => E2_f1(1:4*E2_NPAIRS)
+      E2_f1 => E2_f_ary
+      E2_f(1:4, 1:E2_NPAIRS) => E2_f1(1:4 * E2_NPAIRS)
 
-    call table_atm_init(use_cache, ierr)
+      call table_atm_init(use_cache, ierr)
 
-    include 'e2_pairs.dek'
+      include 'e2_pairs.dek'
 
-  end subroutine init
+   end subroutine init
 
-  !****
+   !****
 
-  subroutine shutdown()
+   subroutine shutdown()
 
-    use table_atm, only : table_atm_shutdown
+      use table_atm, only : table_atm_shutdown
 
-    call table_atm_shutdown()
+      call table_atm_shutdown()
 
-  end subroutine shutdown
+   end subroutine shutdown
 
-  !****
+   !****
 
-  subroutine eval_Teff_g(L, R, M, cgrav, Teff, g)
+   subroutine eval_Teff_g(L, R, M, cgrav, Teff, g)
 
-    real(dp), intent(in)  :: L
-    real(dp), intent(in)  :: R
-    real(dp), intent(in)  :: M
-    real(dp), intent(in)  :: cgrav
-    real(dp), intent(out) :: Teff
-    real(dp), intent(out) :: g
+      real(dp), intent(in) :: L
+      real(dp), intent(in) :: R
+      real(dp), intent(in) :: M
+      real(dp), intent(in) :: cgrav
+      real(dp), intent(out) :: Teff
+      real(dp), intent(out) :: g
 
-    ! Evaluate the effective temperature and surface gravity
+      ! Evaluate the effective temperature and surface gravity
 
-    Teff = pow(L/(4._dp*pi*R*R*boltz_sigma), 0.25_dp)
-   
-    g = cgrav * M / (R*R)
+      Teff = pow(L / (4._dp * pi * R * R * boltz_sigma), 0.25_dp)
 
-  end subroutine eval_Teff_g
+      g = cgrav * M / (R * R)
 
-  !****
+   end subroutine eval_Teff_g
 
-  function eval_Paczynski_gradr( &
-       T, P, rho, tau, kap, L, M, R, cgrav) result (gradr)
+   !****
 
-    use eos_lib, only: radiation_pressure
-    
-    real(dp), intent(in) :: T
-    real(dp), intent(in) :: P
-    real(dp), intent(in) :: rho
-    real(dp), intent(in) :: tau
-    real(dp), intent(in) :: kap
-    real(dp), intent(in) :: L
-    real(dp), intent(in) :: R
-    real(dp), intent(in) :: M
-    real(dp), intent(in) :: cgrav
-    real(dp)             :: gradr
-    
-    real(dp) :: Prad
-    real(dp) :: dilution_factor
-    real(dp) :: s
-    real(dp) :: f
+   function eval_Paczynski_gradr(&
+      T, P, rho, tau, kap, L, M, R, cgrav) result (gradr)
 
-    ! Evaluate the radiative temperature gradient, using expressions
-    ! from Paczynski (1969, Act Ast, 19, 1)
+      use eos_lib, only : radiation_pressure
 
-    Prad = radiation_pressure(T)
+      real(dp), intent(in) :: T
+      real(dp), intent(in) :: P
+      real(dp), intent(in) :: rho
+      real(dp), intent(in) :: tau
+      real(dp), intent(in) :: kap
+      real(dp), intent(in) :: L
+      real(dp), intent(in) :: R
+      real(dp), intent(in) :: M
+      real(dp), intent(in) :: cgrav
+      real(dp) :: gradr
 
-    gradr = P*kap*L / (16._dp*pi*clight*M*cgrav*Prad)
+      real(dp) :: Prad
+      real(dp) :: dilution_factor
+      real(dp) :: s
+      real(dp) :: f
 
-    if (tau < 2._dp/3._dp) then ! Eqn. 8
+      ! Evaluate the radiative temperature gradient, using expressions
+      ! from Paczynski (1969, Act Ast, 19, 1)
 
-       ! Eqn. 15
+      Prad = radiation_pressure(T)
 
-       s = (2._dp*crad*T*T*T*SQRT(R))/(3._dp*cgrav*M*rho)*pow(L/(8._dp*pi*boltz_sigma), 0.25_dp)
+      gradr = P * kap * L / (16._dp * pi * clight * M * cgrav * Prad)
 
-       ! Eqn. 8
+      if (tau < 2._dp / 3._dp) then ! Eqn. 8
 
-       f = 1._dp - 1.5_dp*tau
+         ! Eqn. 15
 
-       dilution_factor = (1._dp + f*s*(4._dp*pi*cgrav*clight*M)/(kap*L))/(1._dp + f*s)
+         s = (2._dp * crad * T * T * T * SQRT(R)) / (3._dp * cgrav * M * rho) * pow(L / (8._dp * pi * boltz_sigma), 0.25_dp)
 
-       gradr = gradr*dilution_factor
+         ! Eqn. 8
 
-    end if
+         f = 1._dp - 1.5_dp * tau
 
-    ! Finish
+         dilution_factor = (1._dp + f * s * (4._dp * pi * cgrav * clight * M) / (kap * L)) / (1._dp + f * s)
 
-    return
+         gradr = gradr * dilution_factor
 
-  end function eval_Paczynski_gradr
-       
-  !****
+      end if
 
-  subroutine eval_E2(x, E2, dE2_dx, ierr)
+      ! Finish
 
-    use interp_1d_lib
-    use interp_1d_def
+      return
 
-    real(dp), intent(in)  :: x
-    real(dp), intent(out) :: E2
-    real(dp), intent(out) :: dE2_dx
-    integer, intent(out)  :: ierr
+   end function eval_Paczynski_gradr
 
-    real(dp) :: val
-    real(dp) :: slope
+   !****
 
-    ierr = 0
+   subroutine eval_E2(x, E2, dE2_dx, ierr)
 
-    ! Evaluate the E2 exponential integral
+      use interp_1d_lib
+      use interp_1d_def
 
-    if (.not. have_E2_interpolant) then
-       call create_E2_interpolant(ierr)
-       if (ierr /= 0) return
-    end if
+      real(dp), intent(in) :: x
+      real(dp), intent(out) :: E2
+      real(dp), intent(out) :: dE2_dx
+      integer, intent(out) :: ierr
 
-    call interp_value_and_slope(E2_x, E2_NPAIRS, E2_f1, x, val, slope, ierr)
-    if (ierr /= 0) then
-       write(*,*) 'call to interp_value_and_slope failed in eval_E2'
-       return
-    end if
+      real(dp) :: val
+      real(dp) :: slope
 
-    ! val = log10[E2]
-    E2 = exp10(val)
-    dE2_dx = slope*ln10*E2
+      ierr = 0
 
-  end subroutine eval_E2
-  
-  !****
-       
-  subroutine create_E2_interpolant(ierr)
+      ! Evaluate the E2 exponential integral
 
-    use interp_1d_lib
-    use interp_1d_def
+      if (.not. have_E2_interpolant) then
+         call create_E2_interpolant(ierr)
+         if (ierr /= 0) return
+      end if
 
-    use atm_def
+      call interp_value_and_slope(E2_x, E2_NPAIRS, E2_f1, x, val, slope, ierr)
+      if (ierr /= 0) then
+         write(*, *) 'call to interp_value_and_slope failed in eval_E2'
+         return
+      end if
 
-    integer, intent(out) :: ierr
+      ! val = log10[E2]
+      E2 = exp10(val)
+      dE2_dx = slope * ln10 * E2
 
-    integer, parameter :: NWORK = pm_work_size
+   end subroutine eval_E2
 
-    real(dp), target  :: work_ary(E2_NPAIRS*NWORK)
-    real(dp), pointer :: work(:)
-    integer           :: i
+   !****
 
-    ierr = 0
+   subroutine create_E2_interpolant(ierr)
 
-    ! Set up an interpolating spline for the E2 exponential integral
+      use interp_1d_lib
+      use interp_1d_def
 
-    work => work_ary
+      use atm_def
 
-    do i= 1, E2_NPAIRS
-       E2_x(i) = E2_pairs(2*i-1)
-       E2_f(1,i) = E2_pairs(2*i)
-    end do
+      integer, intent(out) :: ierr
 
-    call interp_pm(E2_x, E2_NPAIRS, E2_f1, nwork, work, 'atm_utils', ierr)
-    if (ierr /= 0) then
-       write(*,*) 'call to interp_pm failed in create_E2_interpolant'
-    end if
+      integer, parameter :: NWORK = pm_work_size
 
-    have_E2_interpolant = .true.
+      real(dp), target :: work_ary(E2_NPAIRS * NWORK)
+      real(dp), pointer :: work(:)
+      integer :: i
 
-  end subroutine create_E2_interpolant
+      ierr = 0
+
+      ! Set up an interpolating spline for the E2 exponential integral
+
+      work => work_ary
+
+      do i = 1, E2_NPAIRS
+         E2_x(i) = E2_pairs(2 * i - 1)
+         E2_f(1, i) = E2_pairs(2 * i)
+      end do
+
+      call interp_pm(E2_x, E2_NPAIRS, E2_f1, nwork, work, 'atm_utils', ierr)
+      if (ierr /= 0) then
+         write(*, *) 'call to interp_pm failed in create_E2_interpolant'
+      end if
+
+      have_E2_interpolant = .true.
+
+   end subroutine create_E2_interpolant
 
 end module atm_utils

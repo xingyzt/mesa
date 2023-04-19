@@ -10,7 +10,7 @@ program neu_plotter
 
    real(dp) :: Rho, T, log10Rho, log10T, Zbar, Abar
    integer :: ierr
-   character (len=32) :: my_mesa_dir
+   character (len = 32) :: my_mesa_dir
 
    real(dp), parameter :: log10_Tlim = 7.5d0 ! this is what the neu/test uses?
    logical :: flags(num_neu_types) ! true if should include the type of loss
@@ -31,13 +31,13 @@ program neu_plotter
    integer :: iounit
 
    integer :: i_var
-   integer :: j,k, njs,nks
+   integer :: j, k, njs, nks
    real(dp) :: jval, kval
 
    real(dp) :: var, dvardx_0, dvardx, err, dx_0, xdum
    logical :: doing_partial, doing_dfridr, doing_d_dlnd
 
-   character(len=4) :: xname, yname
+   character(len = 4) :: xname, yname
 
    real(dp), parameter :: UNSET = -999
    real(dp), parameter :: min_derivative_error = 1d-4
@@ -51,16 +51,15 @@ program neu_plotter
       xname, yname, doing_partial, doing_dfridr, doing_d_dlnd, &
       i_var
 
-
    include 'formats'
 
    ierr = 0
 
    my_mesa_dir = '../..'
-   call const_init(my_mesa_dir,ierr)
+   call const_init(my_mesa_dir, ierr)
    if (ierr /= 0) then
-      write(*,*) 'const_init failed'
-      call mesa_error(__FILE__,__LINE__)
+      write(*, *) 'const_init failed'
+      call mesa_error(__FILE__, __LINE__)
    end if
 
    call math_init()
@@ -80,72 +79,71 @@ program neu_plotter
 
    ! check i_var
    if ((i_var < 0) .or. (i_var > num_neu_types)) then
-      write(*,*) 'invalid value of i_var'
+      write(*, *) 'invalid value of i_var'
       stop
    end if
-   
+
    ! get info from namelist
-   open(newunit=iounit, file='inlist_plotter')
-   read(iounit, nml=plotter)
+   open(newunit = iounit, file = 'inlist_plotter')
+   read(iounit, nml = plotter)
    close(iounit)
 
    if (trim(xname) == trim(yname)) then
-      write(*,*) 'xname == yname'
+      write(*, *) 'xname == yname'
       stop
    end if
 
    ! file for output
-   open(newunit=iounit, file='neu_plotter.dat')
+   open(newunit = iounit, file = 'neu_plotter.dat')
 
    if (doing_partial) then
       if (doing_d_dlnd) then
-         write(*,*) 'plotting partial of log(neu) w.r.t. logRho'
-         write(iounit,*) 'log(neu) (partial w.r.t. logRho)'
+         write(*, *) 'plotting partial of log(neu) w.r.t. logRho'
+         write(iounit, *) 'log(neu) (partial w.r.t. logRho)'
       else
-         write(*,*) 'plotting partial of log(neu) w.r.t. logT'
-         write(iounit,*) 'log(neu) (partial w.r.t. logT)'
+         write(*, *) 'plotting partial of log(neu) w.r.t. logT'
+         write(iounit, *) 'log(neu) (partial w.r.t. logT)'
       end if
    else
-      write(*,*) 'plotting log(neu)'
-      write(iounit,*) 'log(neu)'
+      write(*, *) 'plotting log(neu)'
+      write(iounit, *) 'log(neu)'
    end if
 
    select case(xname)
    case('T')
       njs = nT
-      write(iounit,*) 'log10(T)'
+      write(iounit, *) 'log10(T)'
    case('Rho')
       njs = nRho
-      write(iounit,*) 'log10(Rho)'
+      write(iounit, *) 'log10(Rho)'
    case('Zbar')
       njs = nZbar
-      write(iounit,*) 'Zbar'
+      write(iounit, *) 'Zbar'
    case('Abar')
       njs = nAbar
-      write(iounit,*) 'Abar'
+      write(iounit, *) 'Abar'
    case default
-      write(*,*) 'invalid xname'
+      write(*, *) 'invalid xname'
       stop
    end select
 
    select case(yname)
    case('T')
       nks = nT
-      write(iounit,*) 'log10(T)'
+      write(iounit, *) 'log10(T)'
    case('Rho')
       nks = nRho
-      write(iounit,*) 'log10(Rho)'
+      write(iounit, *) 'log10(Rho)'
    case('Zbar')
       nks = nZbar
-      write(iounit,*) 'Zbar'
+      write(iounit, *) 'Zbar'
    case('Abar')
       nks = nAbar
-      write(iounit,*) 'Abar'
+      write(iounit, *) 'Abar'
    case default
-      write(*,*) 'invalid yname'
+      write(*, *) 'invalid yname'
       stop
    end select
-
 
    if ((logT_center == UNSET) .or. (delta_logT == UNSET)) then
       logT_center = 0.5d0 * (logT_max + logT_min)
@@ -172,40 +170,38 @@ program neu_plotter
    end if
 
    if ((Abar_center == UNSET) .or. (delta_Abar == UNSET)) then
-      Abar_center = 0.5d0*(Abar_max + Abar_min)
+      Abar_center = 0.5d0 * (Abar_max + Abar_min)
       delta_Abar = (Abar_max - Abar_min)
    else
       Abar_min = Abar_center - delta_Abar * 0.5d0
       Abar_max = Abar_center - delta_Abar * 0.5d0
    end if
 
-
    if (nT .gt. 1) then
-      logT_step = delta_logT / (nT-1d0)
+      logT_step = delta_logT / (nT - 1d0)
    else
       logT_step = 0
    end if
 
    if (nRho .gt. 1) then
-      logRho_step = delta_logRho / (nRho-1d0)
+      logRho_step = delta_logRho / (nRho - 1d0)
    else
       logRho_step = 0
    end if
 
    if (nZbar .gt. 1) then
-      Zbar_step = delta_Zbar / (nZbar-1d0)
+      Zbar_step = delta_Zbar / (nZbar - 1d0)
    else
       Zbar_step = 0
    end if
 
    if (nAbar .gt. 1) then
-      Abar_step = delta_Abar / (nAbar-1d0)
+      Abar_step = delta_Abar / (nAbar - 1d0)
    else
       Abar_step = 0
    end if
 
-
-   write(iounit,*) nks, njs
+   write(iounit, *) nks, njs
 
    log10T = logT_center
    T = exp10(log10T)
@@ -214,40 +210,40 @@ program neu_plotter
    Zbar = Zbar_center
    Abar = Abar_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j = 1, njs !x
+      do k = 1, nks !y
 
          select case(xname)
          case('T')
-            log10T = logT_min + logT_step*(j - 1)
+            log10T = logT_min + logT_step * (j - 1)
             T = exp10(log10T)
             jval = log10T
          case('Rho')
-            log10Rho = logRho_min + logRho_step*(j - 1)
+            log10Rho = logRho_min + logRho_step * (j - 1)
             rho = exp10(log10Rho)
             jval = log10Rho
          case('Zbar')
-            Zbar = Zbar_min + Zbar_step*(j - 1)
+            Zbar = Zbar_min + Zbar_step * (j - 1)
             jval = Zbar
          case('Abar')
-            Abar = Abar_min + Abar_step*(j - 1)
+            Abar = Abar_min + Abar_step * (j - 1)
             jval = Abar
          end select
 
          select case(yname)
          case('T')
-            log10T = logT_min + logT_step*(k - 1)
+            log10T = logT_min + logT_step * (k - 1)
             T = exp10(log10T)
             kval = log10T
          case('Rho')
-            log10Rho = logRho_min + logRho_step*(k - 1)
+            log10Rho = logRho_min + logRho_step * (k - 1)
             rho = exp10(log10Rho)
             kval = log10Rho
          case('Zbar')
-            Zbar = Zbar_min + Zbar_step*(k - 1)
+            Zbar = Zbar_min + Zbar_step * (k - 1)
             kval = Zbar
          case('Abar')
-            Abar = Abar_min + Abar_step*(k - 1)
+            Abar = Abar_min + Abar_step * (k - 1)
             kval = Abar
          end select
 
@@ -300,20 +296,18 @@ program neu_plotter
 
             dx_0 = 1d-3
             err = 0d0
-            dvardx = dfridr(dx_0,dfridr_func,err)
-            xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
+            dvardx = dfridr(dx_0, dfridr_func, err)
+            xdum = (dvardx - dvardx_0) / max(abs(dvardx_0), min_derivative_error)
             res1 = safe_log10(xdum)
          end if
 
-
-         write(iounit,*) kval, jval, res1
+         write(iounit, *) kval, jval, res1
       end do
    end do
 
-
    if (ierr /= 0) then
-      write(*,*) 'bad result from neu_get'
-      call mesa_error(__FILE__,__LINE__)
+      write(*, *) 'bad result from neu_get'
+      call mesa_error(__FILE__, __LINE__)
    end if
 
 contains
@@ -325,16 +319,16 @@ contains
       include 'formats'
       ierr = 0
 
-      lnT = log10T*ln10
-      lnd = log10Rho*ln10
-      
+      lnT = log10T * ln10
+      lnd = log10Rho * ln10
+
       if (doing_d_dlnd) then
-         log_var = (lnd + delta_x)/ln10
+         log_var = (lnd + delta_x) / ln10
          var = exp10(log_var)
          call neu_get(T, log10T, var, log_var, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
       else
-         log_var = (lnT + delta_x)/ln10
+         log_var = (lnT + delta_x) / ln10
          var = exp10(log_var)
          call neu_get(var, log_var, Rho, log10Rho, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)

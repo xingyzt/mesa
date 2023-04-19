@@ -1,7 +1,7 @@
 program kap_plotter
 
    use eos_def
-   use eos_lib, only: eos_ptr, eosDT_get
+   use eos_lib, only : eos_ptr, eosDT_get
    use kap_def
    use kap_lib
    use chem_def
@@ -13,8 +13,8 @@ program kap_plotter
    implicit none
 
    integer, parameter :: species = 14
-   integer, parameter :: h1=1, he3=2, he4=3, c12=4, n14=5, o16=6, ne20=7, f20=8, o20=9, &
-      mg24=10, na24=11, ne24=12, si28=13, fe56=14
+   integer, parameter :: h1 = 1, he3 = 2, he4 = 3, c12 = 4, n14 = 5, o16 = 6, ne20 = 7, f20 = 8, o20 = 9, &
+      mg24 = 10, na24 = 11, ne24 = 12, si28 = 13, fe56 = 14
    integer, pointer, dimension(:) :: net_iso, chem_id
    real(dp) :: xa(species)
 
@@ -26,7 +26,7 @@ program kap_plotter
    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
    real(dp), dimension(num_eos_basic_results, species) :: d_dxa
    integer :: ierr
-   character (len=32) :: my_mesa_dir
+   character (len = 32) :: my_mesa_dir
 
    real(dp) :: Y, z2bar, z53bar, ye, mass_correction, sumx
    real(dp) :: abar, zbar
@@ -47,13 +47,13 @@ program kap_plotter
    integer :: iounit
 
    integer :: i_var
-   integer :: j,k, njs,nks
+   integer :: j, k, njs, nks
    real(dp) :: jval, kval
 
    real(dp) :: var, dvardx_0, dvardx, err, dx_0, xdum
    logical :: doing_partial, doing_dfridr, doing_d_dlnd
 
-   character(len=4) :: xname, yname
+   character(len = 4) :: xname, yname
 
    real(dp), parameter :: UNSET = -999
    real(dp), parameter :: min_derivative_error = 1d-4
@@ -67,24 +67,23 @@ program kap_plotter
       xname, yname, doing_partial, doing_dfridr, doing_d_dlnd, &
       i_var
 
-
    include 'formats'
 
    ierr = 0
 
    my_mesa_dir = '../..'
-   call const_init(my_mesa_dir,ierr)
+   call const_init(my_mesa_dir, ierr)
    if (ierr /= 0) then
-      write(*,*) 'const_init failed'
-      call mesa_error(__FILE__,__LINE__)
+      write(*, *) 'const_init failed'
+      call mesa_error(__FILE__, __LINE__)
    end if
 
    call math_init()
 
    call chem_init('isotopes.data', ierr)
    if (ierr /= 0) then
-      write(*,*) 'failed in chem_init'
-      call mesa_error(__FILE__,__LINE__)
+      write(*, *) 'failed in chem_init'
+      call mesa_error(__FILE__, __LINE__)
    end if
 
    ! allocate and initialize the eos tables
@@ -95,8 +94,8 @@ program kap_plotter
    call Setup_kap(kap_handle)
    call kap_ptr(kap_handle, kap_rq, ierr)
 
-   allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'allocate failed')
+   allocate(net_iso(num_chem_isos), chem_id(species), stat = ierr)
+   if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'allocate failed')
 
    logRho_center = UNSET
    logT_center = UNSET
@@ -112,67 +111,66 @@ program kap_plotter
    doing_d_dlnd = .true.
 
    ! get info from namelist
-   open(newunit=iounit, file='inlist_plotter')
-   read(iounit, nml=plotter)
+   open(newunit = iounit, file = 'inlist_plotter')
+   read(iounit, nml = plotter)
    close(iounit)
 
    if (trim(xname) == trim(yname)) then
-      write(*,*) 'xname == yname'
+      write(*, *) 'xname == yname'
       stop
    end if
 
    ! file for output
-   open(newunit=iounit, file='kap_plotter.dat')
+   open(newunit = iounit, file = 'kap_plotter.dat')
 
    if (doing_partial) then
       if (doing_d_dlnd) then
-         write(*,*) 'plotting partial of log(kap) w.r.t. logRho'
-         write(iounit,*) 'log(kap) (partial w.r.t. logRho)'
+         write(*, *) 'plotting partial of log(kap) w.r.t. logRho'
+         write(iounit, *) 'log(kap) (partial w.r.t. logRho)'
       else
-         write(*,*) 'plotting partial of log(kap) w.r.t. logT'
-         write(iounit,*) 'log(kap) (partial w.r.t. logT)'
+         write(*, *) 'plotting partial of log(kap) w.r.t. logT'
+         write(iounit, *) 'log(kap) (partial w.r.t. logT)'
       end if
    else
-      write(*,*) 'plotting log(kap)'
-      write(iounit,*) 'log(kap)'
+      write(*, *) 'plotting log(kap)'
+      write(iounit, *) 'log(kap)'
    end if
 
    select case(xname)
    case('T')
       njs = nT
-      write(iounit,*) 'log10(T)'
+      write(iounit, *) 'log10(T)'
    case('Rho')
       njs = nRho
-      write(iounit,*) 'log10(Rho)'
+      write(iounit, *) 'log10(Rho)'
    case('X')
       njs = nX
-      write(iounit,*) 'X'
+      write(iounit, *) 'X'
    case('Z')
       njs = nZ
-      write(iounit,*) 'Z'
+      write(iounit, *) 'Z'
    case default
-      write(*,*) 'invalid xname'
+      write(*, *) 'invalid xname'
       stop
    end select
 
    select case(yname)
    case('T')
       nks = nT
-      write(iounit,*) 'log10(T)'
+      write(iounit, *) 'log10(T)'
    case('Rho')
       nks = nRho
-      write(iounit,*) 'log10(Rho)'
+      write(iounit, *) 'log10(Rho)'
    case('X')
       nks = nX
-      write(iounit,*) 'X'
+      write(iounit, *) 'X'
    case('Z')
       nks = nZ
-      write(iounit,*) 'Z'
+      write(iounit, *) 'Z'
    case default
-      write(*,*) 'invalid yname'
+      write(*, *) 'invalid yname'
       stop
    end select
-
 
    if ((logT_center == UNSET) .or. (delta_logT == UNSET)) then
       logT_center = 0.5d0 * (logT_max + logT_min)
@@ -199,40 +197,38 @@ program kap_plotter
    end if
 
    if ((Z_center == UNSET) .or. (delta_Z == UNSET)) then
-      Z_center = 0.5d0*(Z_max + Z_min)
+      Z_center = 0.5d0 * (Z_max + Z_min)
       delta_Z = (Z_max - Z_min)
    else
       Z_min = Z_center - delta_Z * 0.5d0
       Z_max = Z_center - delta_Z * 0.5d0
    end if
 
-
    if (nT .gt. 1) then
-      logT_step = delta_logT / (nT-1d0)
+      logT_step = delta_logT / (nT - 1d0)
    else
       logT_step = 0
    end if
 
    if (nRho .gt. 1) then
-      logRho_step = delta_logRho / (nRho-1d0)
+      logRho_step = delta_logRho / (nRho - 1d0)
    else
       logRho_step = 0
    end if
 
    if (nX .gt. 1) then
-      X_step = delta_X / (nX-1d0)
+      X_step = delta_X / (nX - 1d0)
    else
       X_step = 0
    end if
 
    if (nZ .gt. 1) then
-      Z_step = delta_Z / (nZ-1d0)
+      Z_step = delta_Z / (nZ - 1d0)
    else
       Z_step = 0
    end if
 
-
-   write(iounit,*) nks, njs
+   write(iounit, *) nks, njs
 
    log10T = logT_center
    T = exp10(log10T)
@@ -241,40 +237,40 @@ program kap_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j = 1, njs !x
+      do k = 1, nks !y
 
          select case(xname)
          case('T')
-            log10T = logT_min + logT_step*(j - 1)
+            log10T = logT_min + logT_step * (j - 1)
             T = exp10(log10T)
             jval = log10T
          case('Rho')
-            log10Rho = logRho_min + logRho_step*(j - 1)
+            log10Rho = logRho_min + logRho_step * (j - 1)
             rho = exp10(log10Rho)
             jval = log10Rho
          case('X')
-            X = X_min + X_step*(j - 1)
+            X = X_min + X_step * (j - 1)
             jval = X
          case('Z')
-            Z = Z_min + Z_step*(j - 1)
+            Z = Z_min + Z_step * (j - 1)
             jval = Z
          end select
 
          select case(yname)
          case('T')
-            log10T = logT_min + logT_step*(k - 1)
+            log10T = logT_min + logT_step * (k - 1)
             T = exp10(log10T)
             kval = log10T
          case('Rho')
-            log10Rho = logRho_min + logRho_step*(k - 1)
+            log10Rho = logRho_min + logRho_step * (k - 1)
             rho = exp10(log10Rho)
             kval = log10Rho
          case('X')
-            X = X_min + X_step*(k - 1)
+            X = X_min + X_step * (k - 1)
             kval = X
          case('Z')
-            Z = Z_min + Z_step*(k - 1)
+            Z = Z_min + Z_step * (k - 1)
             kval = Z
          end select
 
@@ -286,17 +282,17 @@ program kap_plotter
             Rho, log10Rho, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          if (ierr /= 0) then
-            write(*,*) 'failed in eosDT_get'
-            write(*,1) 'log10Rho', log10Rho
-            write(*,1) 'log10T', log10T
-            call mesa_error(__FILE__,__LINE__)
+            write(*, *) 'failed in eosDT_get'
+            write(*, 1) 'log10Rho', log10Rho
+            write(*, 1) 'log10T', log10T
+            call mesa_error(__FILE__, __LINE__)
          end if
-         
-         call kap_get( &
-              kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
-              res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
-              res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
-              kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
+
+         call kap_get(&
+            kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
+            res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
+            res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
          frac_Type2 = kap_fracs(i_frac_Type2)
 
@@ -320,13 +316,12 @@ program kap_plotter
 
             dx_0 = 1d-3
             err = 0d0
-            dvardx = dfridr(dx_0,dfridr_func,err)
-            xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
+            dvardx = dfridr(dx_0, dfridr_func, err)
+            xdum = (dvardx - dvardx_0) / max(abs(dvardx_0), min_derivative_error)
             res1 = safe_log10(abs(xdum))
          end if
 
-
-         write(iounit,*) kval, jval, res1
+         write(iounit, *) kval, jval, res1
       end do
    end do
 
@@ -337,8 +332,8 @@ program kap_plotter
    deallocate(net_iso, chem_id)
 
    if (ierr /= 0) then
-      write(*,*) 'bad result from kap_get'
-      call mesa_error(__FILE__,__LINE__)
+      write(*, *) 'bad result from kap_get'
+      call mesa_error(__FILE__, __LINE__)
    end if
 
 contains
@@ -349,7 +344,7 @@ contains
       use eos_lib
       integer, intent(out) :: handle
 
-      character (len=256) :: eos_file_prefix
+      character (len = 256) :: eos_file_prefix
       integer :: ierr
       logical, parameter :: use_cache = .true.
 
@@ -357,16 +352,16 @@ contains
 
       call eos_init(' ', use_cache, ierr)
       if (ierr /= 0) then
-         write(*,*) 'eos_init failed in Setup_eos'
-         call mesa_error(__FILE__,__LINE__)
+         write(*, *) 'eos_init failed in Setup_eos'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
-      write(*,*) 'loading eos tables'
+      write(*, *) 'loading eos tables'
 
       handle = alloc_eos_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0) then
-         write(*,*) 'failed trying to allocate eos handle'
-         call mesa_error(__FILE__,__LINE__)
+         write(*, *) 'failed trying to allocate eos handle'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
    end subroutine Setup_eos
@@ -392,16 +387,16 @@ contains
 
       call kap_init(use_cache, ' ', ierr)
       if (ierr /= 0) then
-         write(*,*) 'kap_init failed in Setup_eos'
-         call mesa_error(__FILE__,__LINE__)
+         write(*, *) 'kap_init failed in Setup_eos'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
-      write(*,*) 'loading kap tables'
+      write(*, *) 'loading kap tables'
 
       handle = alloc_kap_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0) then
-         write(*,*) 'failed trying to allocate kap handle'
-         call mesa_error(__FILE__,__LINE__)
+         write(*, *) 'failed trying to allocate kap handle'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
    end subroutine Setup_kap
@@ -457,12 +452,12 @@ contains
 
       xa = 0d0
       xa(h1) = X
-      xa(c12) = 0.5*Z
-      xa(o16) = 0.5*Z
+      xa(c12) = 0.5 * Z
+      xa(o16) = 0.5 * Z
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 
-      call basic_composition_info( &
+      call basic_composition_info(&
          species, chem_id, xa, X, Y, Z, &
          abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
 
@@ -475,31 +470,31 @@ contains
       include 'formats'
       ierr = 0
 
-      lnT = log10T*ln10
-      lnd = log10Rho*ln10
+      lnT = log10T * ln10
+      lnd = log10Rho * ln10
 
       ! must call eos to get new lnfree_e info
-      
+
       if (doing_d_dlnd) then
-         log_var = (lnd + delta_x)/ln10
+         log_var = (lnd + delta_x) / ln10
          var = exp10(log_var)
-         call eosDT_get( &
+         call eosDT_get(&
             eos_handle, species, chem_id, net_iso, xa, &
             var, log_var, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
-         call kap_get( &
+         call kap_get(&
             kap_handle, species, chem_id, net_iso, xa, log_var, log10T, &
             res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
             res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
             kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
       else
-         log_var = (lnT + delta_x)/ln10
+         log_var = (lnT + delta_x) / ln10
          var = exp10(log_var)
-         call eosDT_get( &
+         call eosDT_get(&
             eos_handle, species, chem_id, net_iso, xa, &
             Rho, log10Rho, var, log_var, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
-         call kap_get( &
+         call kap_get(&
             kap_handle, species, chem_id, net_iso, xa, log10Rho, log_var, &
             res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
             res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &

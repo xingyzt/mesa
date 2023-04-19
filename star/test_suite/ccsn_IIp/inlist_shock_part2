@@ -1,19 +1,19 @@
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'shock_part1.mod'
+load_saved_model = .true.
+load_model_filename = 'shock_part1.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'shock_part2.mod'
-      required_termination_code_string = 'extras_finish_step'
+save_model_when_terminate = .true.
+save_model_filename = 'shock_part2.mod'
+required_termination_code_string = 'extras_finish_step'
 
-      !pgstar_flag = .false.
+!pgstar_flag = .false.
 
 / ! end of star_job namelist
 
 
 &eos
-   use_PC = .false.
+use_PC = .false.
 / ! end of eos namelist
 
 &kap
@@ -21,16 +21,16 @@
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 15000
-         
-      x_integer_ctrl(1) = 2 ! part number
-      x_ctrl(7) = 0.5 !  setting stop_m in part2, fraction of He layer
-            
+! limit max_model_number as part of test_suite
+max_model_number = 15000
+
+x_integer_ctrl(1) = 2 ! part number
+x_ctrl(7) = 0.5 !  setting stop_m in part2, fraction of He layer
+
 ! RTI      
 
 ! equation controls
-      use_momentum_outer_BC = .true.
+use_momentum_outer_BC = .true.
 
 ! timestep controls      
 
@@ -38,13 +38,13 @@
 
 ! output controls
 
-      terminal_show_age_units = 'seconds'
+terminal_show_age_units = 'seconds'
 
 
 / ! end of controls namelist
 
 &pgstar
-         
+
 !pause = .true.
 
 Grid2_win_flag = .true.

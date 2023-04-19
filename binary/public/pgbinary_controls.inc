@@ -953,7 +953,7 @@ character :: annotation3_side
 real :: annotation3_disp, annotation3_coord, annotation3_fjust
 
 logical, dimension(max_extra_inlists) :: read_extra_pgbinary_inlist
-character (len=strlen), dimension(max_extra_inlists) :: extra_pgbinary_inlist_name
+character (len = strlen), dimension(max_extra_inlists) :: extra_pgbinary_inlist_name
 
 logical :: History_Panels1_use_decorator, &
       History_Panels2_use_decorator, &

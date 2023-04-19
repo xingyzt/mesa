@@ -1,16 +1,15 @@
+module xxx_lib
 
-      module xxx_lib
-      
-      use xxx_def
-      
-      implicit none
+   use xxx_def
+
+   implicit none
 
 
-      contains
-      
-      subroutine xxx
-      
-      end subroutine xxx
+contains
 
-      end module xxx_lib
+   subroutine xxx
+
+   end subroutine xxx
+
+end module xxx_lib
 

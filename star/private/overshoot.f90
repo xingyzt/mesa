@@ -25,322 +25,322 @@
 
 module overshoot
 
-  ! Uses
+   ! Uses
 
-  use const_def
-  use num_lib
-  use star_private_def
+   use const_def
+   use num_lib
+   use star_private_def
 
-  use overshoot_utils
-  use overshoot_exp
-  use overshoot_step
-  
-  ! No implicit typing
+   use overshoot_utils
+   use overshoot_exp
+   use overshoot_step
 
-  implicit none
+   ! No implicit typing
 
-  ! Access specifers
+   implicit none
 
-  private
+   ! Access specifers
 
-  public :: add_overshooting
+   private
 
-  ! Procedures
+   public :: add_overshooting
+
+   ! Procedures
 
 contains
 
-  subroutine add_overshooting (s, ierr)
+   subroutine add_overshooting (s, ierr)
 
-    type(star_info), pointer :: s
-    integer, intent(out)     :: ierr
+      type(star_info), pointer :: s
+      integer, intent(out) :: ierr
 
-    logical, parameter :: DEBUG = .FALSE.
+      logical, parameter :: DEBUG = .FALSE.
 
-    integer  :: i
-    integer  :: j
-    logical  :: is_core
-    logical  :: match_zone_type
-    logical  :: match_zone_loc
-    logical  :: match_bdy_loc
-    integer  :: k_cb
-    integer  :: k_a
-    integer  :: k_b
-    real(dp) :: D(s%nz)
-    real(dp) :: vc(s%nz)
-    integer  :: k
-    integer  :: dk
-    real(dp) :: rho
-    real(dp) :: cdc
-    real(dp) :: r_cb
+      integer :: i
+      integer :: j
+      logical :: is_core
+      logical :: match_zone_type
+      logical :: match_zone_loc
+      logical :: match_bdy_loc
+      integer :: k_cb
+      integer :: k_a
+      integer :: k_b
+      real(dp) :: D(s%nz)
+      real(dp) :: vc(s%nz)
+      integer :: k
+      integer :: dk
+      real(dp) :: rho
+      real(dp) :: cdc
+      real(dp) :: r_cb
 
-    include 'formats'
+      include 'formats'
 
-    ! Initialize
+      ! Initialize
 
-    ierr = 0
+      ierr = 0
 
-    if (DEBUG) then
-       write(*, 3) 'add_overshooting; model, n_conv_bdy=', s%model_number, s%num_conv_boundaries
-    end if
+      if (DEBUG) then
+         write(*, 3) 'add_overshooting; model, n_conv_bdy=', s%model_number, s%num_conv_boundaries
+      end if
 
-    ! Loop over convective boundaries, from center to surface
+      ! Loop over convective boundaries, from center to surface
 
-    conv_bdy_loop : do i = 1, s%num_conv_boundaries
+      conv_bdy_loop : do i = 1, s%num_conv_boundaries
 
-       ! Skip this boundary if it's too close to the center
+         ! Skip this boundary if it's too close to the center
 
-       if (s%conv_bdy_q(i) < s%min_overshoot_q) then
-          if (DEBUG) then
-             write(*,*) 'skip since s%conv_bdy_q(i) < min_overshoot_q', i
-          endif
-          cycle conv_bdy_loop
-       endif
+         if (s%conv_bdy_q(i) < s%min_overshoot_q) then
+            if (DEBUG) then
+               write(*, *) 'skip since s%conv_bdy_q(i) < min_overshoot_q', i
+            endif
+            cycle conv_bdy_loop
+         endif
 
-       ! Skip this boundary if it's at the surface, since we don't
-       ! overshoot there
+         ! Skip this boundary if it's at the surface, since we don't
+         ! overshoot there
 
-       if (s%conv_bdy_loc(i) == 1) then
-          if (DEBUG) then
-             write(*,*) 'skip since s%conv_bdy_loc(i) == 1', i
-          endif
-          cycle conv_bdy_loop
-       end if
+         if (s%conv_bdy_loc(i) == 1) then
+            if (DEBUG) then
+               write(*, *) 'skip since s%conv_bdy_loc(i) == 1', i
+            endif
+            cycle conv_bdy_loop
+         end if
 
-       ! Loop over overshoot criteria
+         ! Loop over overshoot criteria
 
-       criteria_loop : do j = 1, NUM_OVERSHOOT_PARAM_SETS
+         criteria_loop : do j = 1, NUM_OVERSHOOT_PARAM_SETS
 
-          if (s%overshoot_scheme(j) == '') cycle criteria_loop
+            if (s%overshoot_scheme(j) == '') cycle criteria_loop
 
-          ! Check if the criteria match the current boundary
+            ! Check if the criteria match the current boundary
 
-          select case (s%overshoot_zone_type(j))
-          case ('burn_H')
-             match_zone_type = s%burn_h_conv_region(i)
-          case ('burn_He')
-             match_zone_type = s%burn_he_conv_region(i)
-          case ('burn_Z')
-             match_zone_type = s%burn_z_conv_region(i)
-          case ('nonburn')
-             match_zone_type = .NOT. ( &
+            select case (s%overshoot_zone_type(j))
+            case ('burn_H')
+               match_zone_type = s%burn_h_conv_region(i)
+            case ('burn_He')
+               match_zone_type = s%burn_he_conv_region(i)
+            case ('burn_Z')
+               match_zone_type = s%burn_z_conv_region(i)
+            case ('nonburn')
+               match_zone_type = .NOT. (&
                   s%burn_h_conv_region(i) .OR. &
-                  s%burn_he_conv_region(i) .OR. &
-                  s%burn_z_conv_region(i) )              
-          case ('any')
-             match_zone_type = .TRUE.
-          case default
-             write(*,*) 'Invalid overshoot_zone_type: j, s%overshoot_zone_type(j)=', j, s%overshoot_zone_type(j)
-             ierr = -1
-             return
-          end select
+                     s%burn_he_conv_region(i) .OR. &
+                     s%burn_z_conv_region(i))
+            case ('any')
+               match_zone_type = .TRUE.
+            case default
+               write(*, *) 'Invalid overshoot_zone_type: j, s%overshoot_zone_type(j)=', j, s%overshoot_zone_type(j)
+               ierr = -1
+               return
+            end select
 
-          is_core = (i == 1 .AND. s%R_center == 0d0 .AND. s%top_conv_bdy(i))
+            is_core = (i == 1 .AND. s%R_center == 0d0 .AND. s%top_conv_bdy(i))
 
-          select case (s%overshoot_zone_loc(j))
-          case ('core')
-             match_zone_loc = is_core
-          case ('shell')
-             match_zone_loc = .NOT. is_core
-          case ('any')
-             match_zone_loc = .TRUE.
-          case default
-             write(*,*) 'Invalid overshoot_zone_loc: j, s%overshoot_zone_loc(j)=', j, s%overshoot_zone_loc(j)
-             ierr = -1
-             return
-          end select
+            select case (s%overshoot_zone_loc(j))
+            case ('core')
+               match_zone_loc = is_core
+            case ('shell')
+               match_zone_loc = .NOT. is_core
+            case ('any')
+               match_zone_loc = .TRUE.
+            case default
+               write(*, *) 'Invalid overshoot_zone_loc: j, s%overshoot_zone_loc(j)=', j, s%overshoot_zone_loc(j)
+               ierr = -1
+               return
+            end select
 
-          select case (s%overshoot_bdy_loc(j))
-          case ('bottom')
-             match_bdy_loc = .NOT. s%top_conv_bdy(i)
-          case ('top')
-             match_bdy_loc = s%top_conv_bdy(i)
-          case ('any')
-             match_bdy_loc = .TRUE.
-          case default
-             write(*,*) 'Invalid overshoot_bdy_loc: j, s%overshoot_bdy_loc(j)=', j, s%overshoot_bdy_loc(j)
-             ierr = -1
-             return
-          end select
+            select case (s%overshoot_bdy_loc(j))
+            case ('bottom')
+               match_bdy_loc = .NOT. s%top_conv_bdy(i)
+            case ('top')
+               match_bdy_loc = s%top_conv_bdy(i)
+            case ('any')
+               match_bdy_loc = .TRUE.
+            case default
+               write(*, *) 'Invalid overshoot_bdy_loc: j, s%overshoot_bdy_loc(j)=', j, s%overshoot_bdy_loc(j)
+               ierr = -1
+               return
+            end select
 
-          if (.NOT. (match_zone_type .AND. match_zone_loc .AND. match_bdy_loc)) cycle criteria_loop
+            if (.NOT. (match_zone_type .AND. match_zone_loc .AND. match_bdy_loc)) cycle criteria_loop
 
-          if (DEBUG) then
-             write(*,*) 'Overshooting at convective boundary: i, j=', i, j
-             write(*,*) '  s%overshoot_scheme=', TRIM(s%overshoot_scheme(j))
-             write(*,*) '  s%overshoot_zone_type=', TRIM(s%overshoot_zone_type(j))
-             write(*,*) '  s%overshoot_zone_loc=', TRIM(s%overshoot_zone_loc(j))
-             write(*,*) '  s%overshoot_bdy_loc=', TRIM(s%overshoot_bdy_loc(j))
-          endif
+            if (DEBUG) then
+               write(*, *) 'Overshooting at convective boundary: i, j=', i, j
+               write(*, *) '  s%overshoot_scheme=', TRIM(s%overshoot_scheme(j))
+               write(*, *) '  s%overshoot_zone_type=', TRIM(s%overshoot_zone_type(j))
+               write(*, *) '  s%overshoot_zone_loc=', TRIM(s%overshoot_zone_loc(j))
+               write(*, *) '  s%overshoot_bdy_loc=', TRIM(s%overshoot_bdy_loc(j))
+            endif
 
-          ! Special-case check for an overshoot scheme of 'none' (this can be used
-          ! to turn *off* overshoot for specific boundary configurations)
+            ! Special-case check for an overshoot scheme of 'none' (this can be used
+            ! to turn *off* overshoot for specific boundary configurations)
 
-          if (s%overshoot_scheme(j) == 'none') exit criteria_loop
+            if (s%overshoot_scheme(j) == 'none') exit criteria_loop
 
-          ! Evaluate convective boundary (_cb) parameters
+            ! Evaluate convective boundary (_cb) parameters
 
-          call eval_conv_bdy_k(s, i, k_cb, ierr)
-          if (ierr /= 0) return
+            call eval_conv_bdy_k(s, i, k_cb, ierr)
+            if (ierr /= 0) return
 
-          ! Evaluate the overshoot diffusion coefficient and velocity
-          ! using the appropriate scheme-dependent routine
+            ! Evaluate the overshoot diffusion coefficient and velocity
+            ! using the appropriate scheme-dependent routine
 
-          select case (s%overshoot_scheme(j))
-          case ('exponential')
-             call eval_overshoot_exp(s, i, j, k_a, k_b, D, vc, ierr)
-          case ('step')
-             call eval_overshoot_step(s, i, j, k_a, k_b, D, vc, ierr)
-          case ('other')
-             call s% other_overshooting_scheme(s% id, i, j, k_a, k_b, D, vc, ierr)
-          case default
-             write(*,*) 'Invalid overshoot_scheme:', s%overshoot_scheme(j)
-             ierr = -1
-          end select
+            select case (s%overshoot_scheme(j))
+            case ('exponential')
+               call eval_overshoot_exp(s, i, j, k_a, k_b, D, vc, ierr)
+            case ('step')
+               call eval_overshoot_step(s, i, j, k_a, k_b, D, vc, ierr)
+            case ('other')
+               call s% other_overshooting_scheme(s% id, i, j, k_a, k_b, D, vc, ierr)
+            case default
+               write(*, *) 'Invalid overshoot_scheme:', s%overshoot_scheme(j)
+               ierr = -1
+            end select
 
-          if (ierr /= 0) return
+            if (ierr /= 0) return
 
-          ! Update the model
+            ! Update the model
 
-          if (s%top_conv_bdy(i)) then
-             dk = -1
-          else
-             dk = 1
-          endif
+            if (s%top_conv_bdy(i)) then
+               dk = -1
+            else
+               dk = 1
+            endif
 
-          face_loop : do k = k_a, k_b, dk
+            face_loop : do k = k_a, k_b, dk
 
-             ! Check if the overshoot will be stabilized by the stratification
+               ! Check if the overshoot will be stabilized by the stratification
 
-             if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
-                
-                if (.not. s% calculate_Brunt_N2) &
-                   call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
+               if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
 
-                ! (NB: we examine B(k+dk) rather than B(k), as the latter
-                ! would allow the overshoot region to eat into a composition
-                ! gradient). Special case for k == 1 or k == nz
+                  if (.not. s% calculate_Brunt_N2) &
+                     call mesa_error(__FILE__, __LINE__, 'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
-                if (k > 1 .AND. k < s%nz) then
-                   if (s%unsmoothed_brunt_B(k+dk) > s%overshoot_brunt_B_max) exit face_loop
-                else
-                   if (s%unsmoothed_brunt_B(k) > s%overshoot_brunt_B_max) exit face_loop
-                endif
+                  ! (NB: we examine B(k+dk) rather than B(k), as the latter
+                  ! would allow the overshoot region to eat into a composition
+                  ! gradient). Special case for k == 1 or k == nz
 
-             endif
+                  if (k > 1 .AND. k < s%nz) then
+                     if (s%unsmoothed_brunt_B(k + dk) > s%overshoot_brunt_B_max) exit face_loop
+                  else
+                     if (s%unsmoothed_brunt_B(k) > s%overshoot_brunt_B_max) exit face_loop
+                  endif
 
-             ! Check whether D has dropped below the minimum
+               endif
 
-             if (D(k) < s%overshoot_D_min) then
+               ! Check whether D has dropped below the minimum
 
-                ! Update conv_bdy_dq to reflect where D drops below the minimum
-                ! Convective regions can happen to be entirely below s%overshoot_D_min, 
-                ! in which case we ignore this correction.
-                if (s%top_conv_bdy(i)) then
-                   if (s%D_mix(k+1) > s%overshoot_D_min) then
-                      s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
-                      if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
-                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                         write(*,*) 'D(k)', D(k)
-                         write(*,*) 's%D_mix(k+1)', s%D_mix(k+1)
-                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
-                         ierr = -1
-                         return
-                      end if
-                   end if
-                else
-                   if (s%D_mix(k-1) > s%overshoot_D_min) then
-                      s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
-                      if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
-                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                         write(*,*) 'D(k)', D(k)
-                         write(*,*) 's%D_mix(k-1)', s%D_mix(k-1)
-                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k-1), s%dq(k)
-                         ierr = -1
-                         return
-                      end if
-                   end if
-                endif
+               if (D(k) < s%overshoot_D_min) then
 
-                exit face_loop
+                  ! Update conv_bdy_dq to reflect where D drops below the minimum
+                  ! Convective regions can happen to be entirely below s%overshoot_D_min,
+                  ! in which case we ignore this correction.
+                  if (s%top_conv_bdy(i)) then
+                     if (s%D_mix(k + 1) > s%overshoot_D_min) then
+                        s%cz_bdy_dq(k) = find0(0._dp, D(k) - s%overshoot_D_min, s%dq(k), s%D_mix(k + 1) - s%overshoot_D_min)
+                        if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
+                           write(*, *) 'k, k_a, k_b', k, k_a, k_b
+                           write(*, *) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                           write(*, *) 'D(k)', D(k)
+                           write(*, *) 's%D_mix(k+1)', s%D_mix(k + 1)
+                           write(*, *) 's%overshoot_D_min', s%overshoot_D_min
+                           write(*, *) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
+                           ierr = -1
+                           return
+                        end if
+                     end if
+                  else
+                     if (s%D_mix(k - 1) > s%overshoot_D_min) then
+                        s%cz_bdy_dq(k - 1) = find0(0._dp, s%D_mix(k - 1) - s%overshoot_D_min, s%dq(k - 1), D(k) - s%overshoot_D_min)
+                        if (s%cz_bdy_dq(k - 1) < 0._dp .OR. s%cz_bdy_dq(k - 1) > s%dq(k - 1)) then
+                           write(*, *) 'k, k_a, k_b', k, k_a, k_b
+                           write(*, *) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                           write(*, *) 'D(k)', D(k)
+                           write(*, *) 's%D_mix(k-1)', s%D_mix(k - 1)
+                           write(*, *) 's%overshoot_D_min', s%overshoot_D_min
+                           write(*, *) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k - 1), s%dq(k)
+                           ierr = -1
+                           return
+                        end if
+                     end if
+                  endif
 
-             endif
+                  exit face_loop
 
-             ! Revise mixing coefficients
+               endif
 
-             if (k > 1) then
-                rho = (s%dq(k-1)*s%rho(k) + s%dq(k)*s%rho(k-1))/ &
-                      (s%dq(k-1) + s%dq(k))
-             else
-                rho = s%rho(k)
-             endif
-       
-             cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
+               ! Revise mixing coefficients
 
-             call eval_conv_bdy_r(s, i, r_cb, ierr)
-             if (ierr /= 0) then
-                write(*,*) 'error calling eval_conv_bdy_r in overshoot:add_overshooting'
-                return
-             end if
+               if (k > 1) then
+                  rho = (s%dq(k - 1) * s%rho(k) + s%dq(k) * s%rho(k - 1)) / &
+                     (s%dq(k - 1) + s%dq(k))
+               else
+                  rho = s%rho(k)
+               endif
 
-             if (s% r(k)*dk >= r_cb*dk) then
+               cdc = (pi4 * s%r(k) * s%r(k) * rho) * (pi4 * s%r(k) * s%r(k) * rho) * D(k) ! gm^2/sec
 
-                s%cdc(k) = cdc
-                s%D_mix(k) = D(k)
-                s%conv_vel(k) = vc(k)
+               call eval_conv_bdy_r(s, i, r_cb, ierr)
+               if (ierr /= 0) then
+                  write(*, *) 'error calling eval_conv_bdy_r in overshoot:add_overshooting'
+                  return
+               end if
 
-             elseif (D(k) > s%D_mix(k)) then
+               if (s% r(k) * dk >= r_cb * dk) then
 
-                s%cdc(k) = cdc
-                s%D_mix(k) = D(k)
-                s%conv_vel(k) = vc(k)
-                s%mixing_type(k) = overshoot_mixing
+                  s%cdc(k) = cdc
+                  s%D_mix(k) = D(k)
+                  s%conv_vel(k) = vc(k)
 
-             end if
+               elseif (D(k) > s%D_mix(k)) then
 
-          end do face_loop
+                  s%cdc(k) = cdc
+                  s%D_mix(k) = D(k)
+                  s%conv_vel(k) = vc(k)
+                  s%mixing_type(k) = overshoot_mixing
 
-          ! If we're still in the convection zone, set the rest of the
-          ! zone to be non-convective
+               end if
 
-          s%cdc(k:k_cb:dk) = 0._dp
-          s%D_mix(k:k_cb:dk) = 0._dp
-          s%conv_vel(k:k_cb:dk) = 0._dp
-          s%mixing_type(k:k_cb:dk) = no_mixing
-          
-          ! Finish (we apply at most a single overshoot scheme to each boundary)
+            end do face_loop
 
-          exit criteria_loop
+            ! If we're still in the convection zone, set the rest of the
+            ! zone to be non-convective
 
-       end do criteria_loop
+            s%cdc(k:k_cb:dk) = 0._dp
+            s%D_mix(k:k_cb:dk) = 0._dp
+            s%conv_vel(k:k_cb:dk) = 0._dp
+            s%mixing_type(k:k_cb:dk) = no_mixing
 
-    end do conv_bdy_loop
+            ! Finish (we apply at most a single overshoot scheme to each boundary)
 
-    ! Perform a sanity check on D_mix
+            exit criteria_loop
 
-    check_loop : do k = 1, s%nz
+         end do criteria_loop
 
-       if (is_bad_num(s%D_mix(k))) then
+      end do conv_bdy_loop
 
-          ierr = -1
+      ! Perform a sanity check on D_mix
 
-          if (s%report_ierr) then
-             write(*,3) 'mixing_type, D_mix', k, s%mixing_type(k), s%D_mix(k)
-          end if
+      check_loop : do k = 1, s%nz
 
-          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_overshooting')
+         if (is_bad_num(s%D_mix(k))) then
 
-       end if
+            ierr = -1
 
-    end do check_loop
+            if (s%report_ierr) then
+               write(*, 3) 'mixing_type, D_mix', k, s%mixing_type(k), s%D_mix(k)
+            end if
 
-    ! Finish
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__, __LINE__, 'add_overshooting')
 
-    return
+         end if
 
-  end subroutine add_overshooting
+      end do check_loop
+
+      ! Finish
+
+      return
+
+   end subroutine add_overshooting
 
 end module overshoot

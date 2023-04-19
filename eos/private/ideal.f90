@@ -1,6 +1,6 @@
 module ideal
 
-   use const_def, only: dp
+   use const_def, only : dp
    use math_lib
    use auto_diff
    use eos_def
@@ -10,12 +10,12 @@ module ideal
    private
    public :: get_ideal_eos_results, get_ideal_alfa, get_ideal_for_eosdt
 
-   contains
+contains
 
-   subroutine get_ideal_alfa( & 
-            rq, logRho, logT, Z, abar, zbar, &
-            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-            ierr)
+   subroutine get_ideal_alfa(&
+      rq, logRho, logT, Z, abar, zbar, &
+      alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+      ierr)
       use const_def
       use eos_blend
       type (EoS_General_Info), pointer :: rq
@@ -29,74 +29,74 @@ module ideal
    end subroutine get_ideal_alfa
 
    subroutine get_ideal_for_eosdt(handle, dbg, Z, X, abar, zbar, species, chem_id, net_iso, xa, &
-                              rho, logRho, T, logT, remaining_fraction, res, d_dlnd, d_dlnT, d_dxa, skip, ierr)
-   integer, intent(in) :: handle
-   logical, intent(in) :: dbg
-   real(dp), intent(in) :: &
-      Z, X, abar, zbar, remaining_fraction
-   integer, intent(in) :: species
-   integer, pointer :: chem_id(:), net_iso(:)
-   real(dp), intent(in) :: xa(:)
-   real(dp), intent(in) :: rho, logRho, T, logT
-   real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
-   real(dp), intent(inout), dimension(nv, species) :: d_dxa
-   logical, intent(out) :: skip
-   integer, intent(out) :: ierr
-   type (EoS_General_Info), pointer :: rq
+      rho, logRho, T, logT, remaining_fraction, res, d_dlnd, d_dlnT, d_dxa, skip, ierr)
+      integer, intent(in) :: handle
+      logical, intent(in) :: dbg
+      real(dp), intent(in) :: &
+         Z, X, abar, zbar, remaining_fraction
+      integer, intent(in) :: species
+      integer, pointer :: chem_id(:), net_iso(:)
+      real(dp), intent(in) :: xa(:)
+      real(dp), intent(in) :: rho, logRho, T, logT
+      real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
+      real(dp), intent(inout), dimension(nv, species) :: d_dxa
+      logical, intent(out) :: skip
+      integer, intent(out) :: ierr
+      type (EoS_General_Info), pointer :: rq
 
-   rq => eos_handles(handle)
+      rq => eos_handles(handle)
 
-   call get_ideal_eos_results(rq, Z, X, abar, zbar, rho, logRho, T, logT, species, chem_id, xa, &
-                              res, d_dlnd, d_dlnT, d_dxa, ierr)
-   skip = .false.
+      call get_ideal_eos_results(rq, Z, X, abar, zbar, rho, logRho, T, logT, species, chem_id, xa, &
+         res, d_dlnd, d_dlnT, d_dxa, ierr)
+      skip = .false.
 
-   ! zero all components
-   res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-   d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-   d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+      ! zero all components
+      res(i_frac:i_frac + num_eos_frac_results - 1) = 0.0
+      d_dlnd(i_frac:i_frac + num_eos_frac_results - 1) = 0.0
+      d_dlnT(i_frac:i_frac + num_eos_frac_results - 1) = 0.0
 
-   ! mark this one
-   res(i_frac_ideal) = 1.0
+      ! mark this one
+      res(i_frac_ideal) = 1.0
 
    end subroutine get_ideal_for_eosdt
 
-   subroutine get_ideal_eos_results( &
-         rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
-         species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)   
-   type (EoS_General_Info), pointer :: rq
-   real(dp), intent(in) :: Z, X, abar, zbar
-   real(dp), intent(in) :: Rho, logRho, T, logT
-   integer, intent(in) :: species
-   integer, pointer :: chem_id(:)
-   real(dp), intent(in) :: xa(:)
-   integer, intent(out) :: ierr
-   real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
-   real(dp), intent(out), dimension(nv, species) :: d_dxa
-   
-   real(dp) :: logT_ion, logT_neutral
+   subroutine get_ideal_eos_results(&
+      rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
+      species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)
+      type (EoS_General_Info), pointer :: rq
+      real(dp), intent(in) :: Z, X, abar, zbar
+      real(dp), intent(in) :: Rho, logRho, T, logT
+      integer, intent(in) :: species
+      integer, pointer :: chem_id(:)
+      real(dp), intent(in) :: xa(:)
+      integer, intent(out) :: ierr
+      real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
+      real(dp), intent(out), dimension(nv, species) :: d_dxa
 
-   ierr = 0
+      real(dp) :: logT_ion, logT_neutral
 
-   call ideal_eos( &
-      T, Rho, X, abar, zbar, &
-      species, chem_id, xa, &
-      res, d_dlnd, d_dlnT, d_dxa, ierr)
+      ierr = 0
 
-   ! composition derivatives not provided
-   d_dxa = 0
-
-   end subroutine get_ideal_eos_results
-
-   subroutine ideal_eos( &
-         temp_in, den_in, Xfrac, abar, zbar,  &
+      call ideal_eos(&
+         T, Rho, X, abar, zbar, &
          species, chem_id, xa, &
          res, d_dlnd, d_dlnT, d_dxa, ierr)
 
+      ! composition derivatives not provided
+      d_dxa = 0
+
+   end subroutine get_ideal_eos_results
+
+   subroutine ideal_eos(&
+      temp_in, den_in, Xfrac, abar, zbar, &
+      species, chem_id, xa, &
+      res, d_dlnd, d_dlnT, d_dxa, ierr)
+
       use eos_def
-      use const_def, only: dp
-      use utils_lib, only: is_bad
-      use chem_def, only: chem_isos
-      use ion_offset, only: compute_ion_offset
+      use const_def, only : dp
+      use utils_lib, only : is_bad
+      use chem_def, only : chem_isos
+      use ion_offset, only : compute_ion_offset
       use skye_ideal
       use skye_thermodynamics
       use auto_diff
@@ -112,7 +112,7 @@ module ideal
       real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
       real(dp), intent(out), dimension(nv, species) :: d_dxa
       real(dp), parameter :: mass_fraction_limit = 1d-10
-      
+
       integer :: relevant_species
       type(auto_diff_real_2var_order3) :: temp, den
       real(dp) :: ACMI(species), A(species), ya(species), select_xa(species), norm
@@ -123,7 +123,7 @@ module ideal
       ierr = 0
       F_ele = 0d0
       F_coul = 0d0
-      
+
       ! No electrons, so extreme negative chemical potential
       etaele = -1d99
       xnefer = 1d-20
@@ -137,12 +137,12 @@ module ideal
       temp = temp_in
       temp%d1val1 = 1d0
       den = den_in
-      den%d1val2 = 1d0      
+      den%d1val2 = 1d0
 
       ! Count and pack relevant species for Coulomb corrections. Relevant means mass fraction above limit.
       relevant_species = 0
       norm = 0d0
-      do j=1,species
+      do j = 1, species
          if (xa(j) > mass_fraction_limit) then
             relevant_species = relevant_species + 1
             ACMI(relevant_species) = chem_isos% W(chem_id(j))
@@ -153,17 +153,17 @@ module ideal
       end do
 
       ! Normalize
-      do j=1,relevant_species
+      do j = 1, relevant_species
          select_xa(j) = select_xa(j) / norm
       end do
 
       ! Compute number fractions
       norm = 0d0
-      do j=1,relevant_species
+      do j = 1, relevant_species
          ya(j) = select_xa(j) / A(j)
          norm = norm + ya(j)
       end do
-      do j=1,relevant_species
+      do j = 1, relevant_species
          ya(j) = ya(j) / norm
       end do
 
@@ -174,11 +174,10 @@ module ideal
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)
 
-
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
-                        phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
+         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
       if(ierr/=0) return
-      
+
       res(i_mu) = 1d0 ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
 
    end subroutine ideal_eos

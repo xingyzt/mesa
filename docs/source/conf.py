@@ -12,8 +12,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('./_ext/'))
 
+sys.path.insert(0, os.path.abspath('./_ext/'))
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +22,6 @@ copyright = '2022, The MESA Team'
 author = 'The MESA Team'
 release = 'main'
 version = 'main'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,7 +40,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -82,7 +80,6 @@ html_logo = 'mesa-logo-200.png'
 html_css_files = [
     'theme_overrides.css',  # overrides for wide tables in RTD theme
 ]
-
 
 # standard substitutions
 rst_prolog = r"""

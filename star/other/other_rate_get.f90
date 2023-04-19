@@ -22,13 +22,13 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-   module other_rate
+
+module other_rate
 
    implicit none
 
    ! set use_other_rate_get = .true. in your controls namelist   
-        
+
    ! edit the extras_controls routine to set the procedure pointer
    !  other_rate_get => my_rate_get
 
@@ -44,7 +44,7 @@
    ! I recommend you use the rates_cache_dir option to redirect your rates_cache when using this hook
    ! So you dont break your whole mesa install.
 
-   contains
+contains
 
 
    subroutine default_other_rate_get(ir, temp, tf, raw_rate, ierr)
@@ -53,11 +53,11 @@
       implicit none
 
       integer :: ir ! Rate id
-      real(dp),intent(in) ::    temp      !< Temperature
+      real(dp), intent(in) :: temp      !< Temperature
       type (T_Factors) :: tf !< Various temperature factors
-      real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
-      integer, intent(out) ::   ierr
-   
+      real(dp), intent(inout) :: raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
+      integer, intent(out) :: ierr
+
       ierr = 0
 
       if (trim(reaction_name(ir)) == 'r_c12_ag_o16') then
@@ -66,9 +66,8 @@
 
    end subroutine default_other_rate_get
 
-   end module other_rate
+end module other_rate
         
         
         
         
-  

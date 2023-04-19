@@ -9,7 +9,7 @@ module turb
    private
    public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection
 
-   contains
+contains
 
    !> Computes the diffusivity of thermohaline mixing when the
    !! thermal gradient is stable and the composition gradient is unstable.
@@ -28,10 +28,10 @@ module turb
    !! @param D_thrm Output, diffusivity.
    !! @param ierr Output, error index.
    subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
-                              iso, XH1, thermohaline_coeff, &
-                              D, gradT, Y_face, conv_vel, mixing_type, ierr)
+      iso, XH1, thermohaline_coeff, &
+      D, gradT, Y_face, conv_vel, mixing_type, ierr)
       use thermohaline
-      character(len=*), intent(in) :: thermohaline_option
+      character(len = *), intent(in) :: thermohaline_option
       type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, T, opacity, rho, Cp
       real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff
       integer, intent(in) :: iso
@@ -49,8 +49,8 @@ module turb
       D = D_thrm
       gradT = gradr
       Y_face = gradT - grada
-      conv_vel = 3d0*D/Lambda
-      mixing_type = thermohaline_mixing 
+      conv_vel = 3d0 * D / Lambda
+      mixing_type = thermohaline_mixing
    end subroutine set_thermohaline
 
    !> Computes the outputs of time-dependent convection theory following the model specified in
@@ -89,21 +89,21 @@ module turb
    !! @param gradT The temperature gradient dlnT/dlnP (output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   subroutine set_TDC( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+   subroutine set_TDC(&
+      conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+      mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+      scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
-      type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
+      type(auto_diff_real_star_order1), intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
       type(auto_diff_real_star_order1) :: L, grav, Lambda, Gamma
-      real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
+      real(dp), parameter :: alpha_c = (1d0 / 2d0) * sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
@@ -115,9 +115,9 @@ module turb
       L = 64 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
       Lambda = mixing_length_alpha * scale_height
       call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+         gradr, grada, gradL, &
+         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
       ! Pack TDC info
       info%report = report
@@ -129,9 +129,9 @@ module turb
       info%L = convert(L)
       info%gradL = convert(gradL)
       info%grada = convert(grada)
-      info%c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)) ! assumes QHSE for dP/dm
-      info%A0 = conv_vel_start/sqrt_2_div_3
+      info%c0 = convert(mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
+      info%L0 = convert((16d0 * pi * crad * clight / 3d0) * cgrav * m * pow4(T) / (P * opacity)) ! assumes QHSE for dP/dm
+      info%A0 = conv_vel_start / sqrt_2_div_3
       info%T = T
       info%rho = rho
       info%dV = dV
@@ -147,7 +147,7 @@ module turb
 
       ! Unpack output
       gradT = Y_face + gradL
-      D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
+      D = conv_vel * scale_height * mixing_length_alpha / 3d0     ! diffusion coefficient [cm^2/sec]
       if (conv_vel > 0d0) then
          mixing_type = convective_mixing
       else
@@ -181,21 +181,21 @@ module turb
    !! @param mixing_type Set to semiconvective if convection operates (output).
    !! @param ierr Tracks errors (output).
    subroutine set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
-                                 semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
-                                 gradL_composition_term, &
-                                 gradT, Y_face, conv_vel, D, mixing_type, ierr)
+      semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
+      gradL_composition_term, &
+      gradT, Y_face, conv_vel, D, mixing_type, ierr)
       use semiconvection
       type(auto_diff_real_star_order1), intent(in) :: L, Lambda, T, P, Pr, beta, opacity, rho
       type(auto_diff_real_star_order1), intent(in) :: Cp, gradr, grada, gradL
-      character(len=*), intent(in) :: semiconvection_option
+      character(len = *), intent(in) :: semiconvection_option
       real(dp), intent(in) :: alpha_semiconvection, cgrav, gradL_composition_term, m
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
       call calc_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
-                                 semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
-                                 gradL_composition_term, &
-                                 gradT, Y_face, conv_vel, D, mixing_type, ierr)
+         semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
+         gradL_composition_term, &
+         gradT, Y_face, conv_vel, D, mixing_type, ierr)
    end subroutine set_semiconvection
 
    !> Calculates the outputs of convective mixing length theory.
@@ -223,20 +223,20 @@ module turb
    !! @param mixing_type Set to convective if convection operates (output).
    !! @param ierr Tracks errors (output).
    subroutine set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+      gradr, grada, gradL, &
+      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
       use mlt
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
-      character(len=*), intent(in) :: MLT_option
+      character(len = *), intent(in) :: MLT_option
       real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
       call calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+         gradr, grada, gradL, &
+         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
    end subroutine set_MLT
 
 end module turb

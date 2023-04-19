@@ -25,309 +25,309 @@
 
 module utils_nan_qp
 
-  ! Uses
+   ! Uses
 
-  use const_def, only : qp
+   use const_def, only : qp
 
-  use ISO_FORTRAN_ENV
-  use ISO_C_BINDING
+   use ISO_FORTRAN_ENV
+   use ISO_C_BINDING
 
-  ! No implicit typing
-      
-  implicit none
+   ! No implicit typing
 
-  ! Parameters
+   implicit none
 
-  integer, parameter :: FRAC_BITS_128_H = 48
-  integer, parameter :: FRAC_BITS_128_L = 64
-  integer, parameter :: EXPN_BITS_128_H = 15
+   ! Parameters
 
-  integer(INT64), parameter :: QNAN_128_H = INT(z'7fff100000000000', INT64)
-  integer(INT64), parameter :: QNAN_128_L = INT(z'0000000000000001', INT64)
-  integer(INT64), parameter :: SNAN_128_H = INT(z'7fff000000000000', INT64)
-  integer(INT64), parameter :: SNAN_128_L = INT(z'0000000000000001', INT64)
+   integer, parameter :: FRAC_BITS_128_H = 48
+   integer, parameter :: FRAC_BITS_128_L = 64
+   integer, parameter :: EXPN_BITS_128_H = 15
 
-  ! Interfaces
+   integer(INT64), parameter :: QNAN_128_H = INT(z'7fff100000000000', INT64)
+   integer(INT64), parameter :: QNAN_128_L = INT(z'0000000000000001', INT64)
+   integer(INT64), parameter :: SNAN_128_H = INT(z'7fff000000000000', INT64)
+   integer(INT64), parameter :: SNAN_128_L = INT(z'0000000000000001', INT64)
 
-  interface is_nan
-     module procedure is_nan_qp
-  end interface is_nan
+   ! Interfaces
 
-  interface is_inf
-     module procedure is_inf_qp
-  end interface is_inf
+   interface is_nan
+      module procedure is_nan_qp
+   end interface is_nan
 
-  interface is_bad
-     module procedure is_bad_qp
-  end interface is_bad
+   interface is_inf
+      module procedure is_inf_qp
+   end interface is_inf
 
-  interface set_nan
-     module procedure set_nan_qp_0d
-     module procedure set_nan_qp_1d
-     module procedure set_nan_qp_2d
-     module procedure set_nan_qp_3d
-     module procedure set_nan_qp_4d
-  end interface set_nan
+   interface is_bad
+      module procedure is_bad_qp
+   end interface is_bad
 
-  ! Access specifiers
+   interface set_nan
+      module procedure set_nan_qp_0d
+      module procedure set_nan_qp_1d
+      module procedure set_nan_qp_2d
+      module procedure set_nan_qp_3d
+      module procedure set_nan_qp_4d
+   end interface set_nan
 
-  private
+   ! Access specifiers
 
-  public :: is_nan
-  public :: is_inf
-  public :: is_bad
-  public :: set_nan
+   private
 
-  ! Procedures
-      
+   public :: is_nan
+   public :: is_inf
+   public :: is_bad
+   public :: set_nan
+
+   ! Procedures
+
 contains
 
-  elemental function is_nan_qp (x, signal) result (is_nan)
+   elemental function is_nan_qp (x, signal) result (is_nan)
 
-    real(qp), target, intent(in)  :: x
-    logical, optional, intent(in) :: signal
-    logical                       :: is_nan
+      real(qp), target, intent(in) :: x
+      logical, optional, intent(in) :: signal
+      logical :: is_nan
 
-    integer(INT64) :: ix(2)
-    integer(INT64) :: frac_l
-    integer(INT64) :: frac_h
-    integer(INT64) :: expn
-    integer(INT64) :: sign
+      integer(INT64) :: ix(2)
+      integer(INT64) :: frac_l
+      integer(INT64) :: frac_h
+      integer(INT64) :: expn
+      integer(INT64) :: sign
 
-    ! Convert x to integer
+      ! Convert x to integer
 
-    ix = TRANSFER(x, ix)
+      ix = TRANSFER(x, ix)
 
-    ! Split out IEEE fields
-    
-    frac_l = IBITS(ix(1), 0, FRAC_BITS_128_L)
-    frac_h = IBITS(ix(2), 0, FRAC_BITS_128_H)
-    expn = IBITS(ix(2), FRAC_BITS_128_H, EXPN_BITS_128_H)
-    sign = IBITS(ix(2), FRAC_BITS_128_H+EXPN_BITS_128_H, 1)
+      ! Split out IEEE fields
 
-    ! Check for NaN
+      frac_l = IBITS(ix(1), 0, FRAC_BITS_128_L)
+      frac_h = IBITS(ix(2), 0, FRAC_BITS_128_H)
+      expn = IBITS(ix(2), FRAC_BITS_128_H, EXPN_BITS_128_H)
+      sign = IBITS(ix(2), FRAC_BITS_128_H + EXPN_BITS_128_H, 1)
 
-    is_nan = expn == MASKR(EXPN_BITS_128_H, INT64) .AND. &
-             (frac_h /= 0_INT64 .OR. frac_l /= 0_INT64)
+      ! Check for NaN
 
-    if (PRESENT(signal)) then
-       is_nan = is_nan .AND. (BTEST(frac_h, FRAC_BITS_128_H-1) .EQV. .NOT. signal)
-    endif
+      is_nan = expn == MASKR(EXPN_BITS_128_H, INT64) .AND. &
+         (frac_h /= 0_INT64 .OR. frac_l /= 0_INT64)
 
-    ! Finish
+      if (PRESENT(signal)) then
+         is_nan = is_nan .AND. (BTEST(frac_h, FRAC_BITS_128_H - 1) .EQV. .NOT. signal)
+      endif
 
-    return
+      ! Finish
 
-  end function is_nan_qp
+      return
 
-  !****
+   end function is_nan_qp
 
-  elemental function is_inf_qp (x) result (is_inf)
+   !****
 
-    real(qp), target, intent(in)  :: x
-    logical                       :: is_inf
+   elemental function is_inf_qp (x) result (is_inf)
 
-    integer(INT64) :: ix(2)
-    integer(INT64) :: frac_l
-    integer(INT64) :: frac_h
-    integer(INT64) :: expn
-    integer(INT64) :: sign
+      real(qp), target, intent(in) :: x
+      logical :: is_inf
 
-    ! Convert x to integer
+      integer(INT64) :: ix(2)
+      integer(INT64) :: frac_l
+      integer(INT64) :: frac_h
+      integer(INT64) :: expn
+      integer(INT64) :: sign
 
-    ix = TRANSFER(x, ix)
+      ! Convert x to integer
 
-    frac_l = IBITS(ix(1), 0, FRAC_BITS_128_L)
-    frac_h = IBITS(ix(2), 0, FRAC_BITS_128_H)
-    expn = IBITS(ix(2), FRAC_BITS_128_H, EXPN_BITS_128_H)
-    sign = IBITS(ix(2), FRAC_BITS_128_H+EXPN_BITS_128_H, 1)
+      ix = TRANSFER(x, ix)
 
-    ! Check for infinity
+      frac_l = IBITS(ix(1), 0, FRAC_BITS_128_L)
+      frac_h = IBITS(ix(2), 0, FRAC_BITS_128_H)
+      expn = IBITS(ix(2), FRAC_BITS_128_H, EXPN_BITS_128_H)
+      sign = IBITS(ix(2), FRAC_BITS_128_H + EXPN_BITS_128_H, 1)
 
-    is_inf = expn == MASKR(EXPN_BITS_128_H, INT64) .AND. &
-             (frac_l == 0_INT64 .AND. frac_h == 0_INT64)
+      ! Check for infinity
 
-    ! Finish
+      is_inf = expn == MASKR(EXPN_BITS_128_H, INT64) .AND. &
+         (frac_l == 0_INT64 .AND. frac_h == 0_INT64)
 
-    return
+      ! Finish
 
-  end function is_inf_qp
+      return
 
-  !****
+   end function is_inf_qp
 
-  elemental function is_bad_qp (x) result (is_bad)
+   !****
 
-    real(qp), intent(in) :: x
-    logical              :: is_bad
+   elemental function is_bad_qp (x) result (is_bad)
 
-    ! Check for NaN or infinity
+      real(qp), intent(in) :: x
+      logical :: is_bad
 
-    is_bad = is_nan(x) .OR. is_inf(x)
+      ! Check for NaN or infinity
 
-    ! Finish
+      is_bad = is_nan(x) .OR. is_inf(x)
 
-    return
+      ! Finish
 
-  end function is_bad_qp
+      return
 
-  !****
-      
-  subroutine set_nan_qp_0d (x, signal)
+   end function is_bad_qp
 
-    real(qp), target, intent(out) :: x
-    logical, optional, intent(in) :: signal
+   !****
 
-    integer(INT64), pointer :: ix(:)
+   subroutine set_nan_qp_0d (x, signal)
 
-    ! Convert x to a signaling or quiet NaN
+      real(qp), target, intent(out) :: x
+      logical, optional, intent(in) :: signal
 
-    call C_F_POINTER(C_LOC(x), ix, [2])
+      integer(INT64), pointer :: ix(:)
 
-    if (PRESENT(signal)) then
-       if (signal) then
-          ix(1) = SNAN_128_L
-          ix(2) = SNAN_128_H
-       else
-          ix(1) = QNAN_128_L
-          ix(2) = QNAN_128_H
-       endif
-    else
-       ix(1) = SNAN_128_L
-       ix(2) = SNAN_128_H
-    endif
+      ! Convert x to a signaling or quiet NaN
 
-    ! Finish
+      call C_F_POINTER(C_LOC(x), ix, [2])
 
-    return
+      if (PRESENT(signal)) then
+         if (signal) then
+            ix(1) = SNAN_128_L
+            ix(2) = SNAN_128_H
+         else
+            ix(1) = QNAN_128_L
+            ix(2) = QNAN_128_H
+         endif
+      else
+         ix(1) = SNAN_128_L
+         ix(2) = SNAN_128_H
+      endif
 
-  end subroutine set_nan_qp_0d
+      ! Finish
 
-  !****
+      return
 
-  subroutine set_nan_qp_1d (x, signal)
+   end subroutine set_nan_qp_0d
 
-    real(qp), target, intent(out) :: x(:)
-    logical, optional, intent(in) :: signal
+   !****
 
-    integer(INT64), pointer :: ix(:,:)
+   subroutine set_nan_qp_1d (x, signal)
 
-    ! Convert x to a signaling or quiet NaN
+      real(qp), target, intent(out) :: x(:)
+      logical, optional, intent(in) :: signal
 
-    call C_F_POINTER(C_LOC(x), ix, [2,SHAPE(x)])
+      integer(INT64), pointer :: ix(:, :)
 
-    if (PRESENT(signal)) then
-       if (signal) then
-          ix(1,:) = SNAN_128_L
-          ix(2,:) = SNAN_128_H
-       else
-          ix(1,:) = QNAN_128_L
-          ix(2,:) = QNAN_128_H
-       endif
-    else
-       ix(1,:) = SNAN_128_L
-       ix(2,:) = SNAN_128_H
-    endif
+      ! Convert x to a signaling or quiet NaN
 
-    ! Finish
+      call C_F_POINTER(C_LOC(x), ix, [2, SHAPE(x)])
 
-    return
+      if (PRESENT(signal)) then
+         if (signal) then
+            ix(1, :) = SNAN_128_L
+            ix(2, :) = SNAN_128_H
+         else
+            ix(1, :) = QNAN_128_L
+            ix(2, :) = QNAN_128_H
+         endif
+      else
+         ix(1, :) = SNAN_128_L
+         ix(2, :) = SNAN_128_H
+      endif
 
-  end subroutine set_nan_qp_1d
+      ! Finish
 
-  !****
+      return
 
-  subroutine set_nan_qp_2d (x, signal)
+   end subroutine set_nan_qp_1d
 
-    real(qp), target, intent(out) :: x(:,:)
-    logical, optional, intent(in) :: signal
+   !****
 
-    integer(INT64), pointer :: ix(:,:,:)
+   subroutine set_nan_qp_2d (x, signal)
 
-    ! Convert x to a signaling or quiet NaN
+      real(qp), target, intent(out) :: x(:, :)
+      logical, optional, intent(in) :: signal
 
-    call C_F_POINTER(C_LOC(x), ix, [2,SHAPE(x)])
+      integer(INT64), pointer :: ix(:, :, :)
 
-    if (PRESENT(signal)) then
-       if (signal) then
-          ix(1,:,:) = SNAN_128_L
-          ix(2,:,:) = SNAN_128_H
-       else
-          ix(1,:,:) = QNAN_128_L
-          ix(2,:,:) = QNAN_128_H
-       endif
-    else
-       ix(1,:,:) = SNAN_128_L
-       ix(2,:,:) = SNAN_128_H
-    endif
+      ! Convert x to a signaling or quiet NaN
 
-    ! Finish
+      call C_F_POINTER(C_LOC(x), ix, [2, SHAPE(x)])
 
-    return
+      if (PRESENT(signal)) then
+         if (signal) then
+            ix(1, :, :) = SNAN_128_L
+            ix(2, :, :) = SNAN_128_H
+         else
+            ix(1, :, :) = QNAN_128_L
+            ix(2, :, :) = QNAN_128_H
+         endif
+      else
+         ix(1, :, :) = SNAN_128_L
+         ix(2, :, :) = SNAN_128_H
+      endif
 
-  end subroutine set_nan_qp_2d
+      ! Finish
 
-  !****
+      return
 
-  subroutine set_nan_qp_3d (x, signal)
+   end subroutine set_nan_qp_2d
 
-    real(qp), target, intent(out) :: x(:,:,:)
-    logical, optional, intent(in) :: signal
+   !****
 
-    integer(INT64), pointer :: ix(:,:,:,:)
+   subroutine set_nan_qp_3d (x, signal)
 
-    ! Convert x to a signaling or quiet NaN
+      real(qp), target, intent(out) :: x(:, :, :)
+      logical, optional, intent(in) :: signal
 
-    call C_F_POINTER(C_LOC(x), ix, [2,SHAPE(x)])
+      integer(INT64), pointer :: ix(:, :, :, :)
 
-    if (PRESENT(signal)) then
-       if (signal) then
-          ix(1,:,:,:) = SNAN_128_L
-          ix(2,:,:,:) = SNAN_128_H
-       else
-          ix(1,:,:,:) = QNAN_128_L
-          ix(2,:,:,:) = QNAN_128_H
-       endif
-    else
-       ix(1,:,:,:) = SNAN_128_L
-       ix(2,:,:,:) = SNAN_128_H
-    endif
+      ! Convert x to a signaling or quiet NaN
 
-    ! Finish
+      call C_F_POINTER(C_LOC(x), ix, [2, SHAPE(x)])
 
-    return
+      if (PRESENT(signal)) then
+         if (signal) then
+            ix(1, :, :, :) = SNAN_128_L
+            ix(2, :, :, :) = SNAN_128_H
+         else
+            ix(1, :, :, :) = QNAN_128_L
+            ix(2, :, :, :) = QNAN_128_H
+         endif
+      else
+         ix(1, :, :, :) = SNAN_128_L
+         ix(2, :, :, :) = SNAN_128_H
+      endif
 
-  end subroutine set_nan_qp_3d
+      ! Finish
 
-  !****
+      return
 
-  subroutine set_nan_qp_4d (x, signal)
+   end subroutine set_nan_qp_3d
 
-    real(qp), target, intent(out) :: x(:,:,:,:)
-    logical, optional, intent(in) :: signal
+   !****
 
-    integer(INT64), pointer :: ix(:,:,:,:,:)
+   subroutine set_nan_qp_4d (x, signal)
 
-    ! Convert x to a signaling or quiet NaN
+      real(qp), target, intent(out) :: x(:, :, :, :)
+      logical, optional, intent(in) :: signal
 
-    call C_F_POINTER(C_LOC(x), ix, [2,SHAPE(x)])
+      integer(INT64), pointer :: ix(:, :, :, :, :)
 
-    if (PRESENT(signal)) then
-       if (signal) then
-          ix(1,:,:,:,:) = SNAN_128_L
-          ix(2,:,:,:,:) = SNAN_128_H
-       else
-          ix(1,:,:,:,:) = QNAN_128_L
-          ix(2,:,:,:,:) = QNAN_128_H
-       endif
-    else
-       ix(1,:,:,:,:) = SNAN_128_L
-       ix(2,:,:,:,:) = SNAN_128_H
-    endif
+      ! Convert x to a signaling or quiet NaN
 
-    ! Finish
+      call C_F_POINTER(C_LOC(x), ix, [2, SHAPE(x)])
 
-    return
+      if (PRESENT(signal)) then
+         if (signal) then
+            ix(1, :, :, :, :) = SNAN_128_L
+            ix(2, :, :, :, :) = SNAN_128_H
+         else
+            ix(1, :, :, :, :) = QNAN_128_L
+            ix(2, :, :, :, :) = QNAN_128_H
+         endif
+      else
+         ix(1, :, :, :, :) = SNAN_128_L
+         ix(2, :, :, :, :) = SNAN_128_H
+      endif
 
-  end subroutine set_nan_qp_4d
+      ! Finish
+
+      return
+
+   end subroutine set_nan_qp_4d
 
 end module utils_nan_qp

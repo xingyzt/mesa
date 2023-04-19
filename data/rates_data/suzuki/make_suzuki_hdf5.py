@@ -3,11 +3,10 @@
 import io
 import lzma
 import re
-import string
 
 import h5py
-
 import numpy as np
+
 
 def make_mesa_rxn_id(isos, wk_str):
     mesa_isos = []
@@ -16,10 +15,10 @@ def make_mesa_rxn_id(isos, wk_str):
         mesa_isos.append('{Z}{A}'.format(**m.groupdict()).lower())
     return '_'.join((mesa_isos[0], wk_str, mesa_isos[-1]))
 
-class SuzukiTable:
 
+class SuzukiTable:
     _columns = ('mu', 'dQ', 'Vs', 'rate', 'nu', 'gamma')
-    _compression_opts = {'compression': 'gzip',}
+    _compression_opts = {'compression': 'gzip', }
 
     def __init__(self, description, data):
 
@@ -35,8 +34,7 @@ class SuzukiTable:
 
         self.data = {}
         for i, col in enumerate(self._columns):
-            self.data[col] = data1d[:, i+2].reshape((nRhoYs, nTs,))
-
+            self.data[col] = data1d[:, i + 2].reshape((nRhoYs, nTs,))
 
     def add_1D_datasets(self, hdf5_group):
 
@@ -47,6 +45,7 @@ class SuzukiTable:
 
         for k, v in self.data.items():
             hdf5_group.create_dataset(k, data=v, **self._compression_opts)
+
 
 class SuzukiData:
 
@@ -114,7 +113,6 @@ class SuzukiData:
 
 
 def add_data(h5file, filename):
-
     # read suzuki datafile
     print(f'reading {filename}')
     data = SuzukiData(filename)

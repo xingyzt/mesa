@@ -25,99 +25,99 @@
 
 module math_io
 
-  ! Uses
+   ! Uses
 
-  use const_lib, only: dp
+   use const_lib, only : dp
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
+   private
 
-  public :: str_to_vector
-  public :: str_to_double
-  public :: double_to_str
+   public :: str_to_vector
+   public :: str_to_double
+   public :: double_to_str
 
-  ! Procedures
+   ! Procedures
 
 contains
 
-  subroutine str_to_vector (str, vec, n, ierr)
+   subroutine str_to_vector (str, vec, n, ierr)
 
-    character (len=*), intent(in)    :: str
-    real(dp), pointer, intent(inout) :: vec(:)
-    integer, intent(out)             :: n
-    integer, intent(out)             :: ierr
+      character (len = *), intent(in) :: str
+      real(dp), pointer, intent(inout) :: vec(:)
+      integer, intent(out) :: n
+      integer, intent(out) :: ierr
 
-    integer :: maxlen
-    integer :: i
-    integer :: j
-    integer :: k
-    integer :: l
+      integer :: maxlen
+      integer :: i
+      integer :: j
+      integer :: k
+      integer :: l
 
-    maxlen = size(vec,dim=1)
+      maxlen = size(vec, dim = 1)
 
-    n = 0
-    ierr = 0
+      n = 0
+      ierr = 0
 
-    l = len_trim(str)
+      l = len_trim(str)
 
-    j = 1
+      j = 1
 
-    do i=1,maxlen
+      do i = 1, maxlen
 
-       do while (j < l .and. str(j:j) == ' ')
-          j = j+1
-       end do
+         do while (j < l .and. str(j:j) == ' ')
+            j = j + 1
+         end do
 
-       k = j
+         k = j
 
-       do while (k < l .and. str(k:k) /= ' ')
-          k = k+1
-       end do
+         do while (k < l .and. str(k:k) /= ' ')
+            k = k + 1
+         end do
 
-       call str_to_double(str(j:k),vec(i),ierr)
-       if (ierr /= 0) then
-          return
-       end if
+         call str_to_double(str(j:k), vec(i), ierr)
+         if (ierr /= 0) then
+            return
+         end if
 
-       n = i
+         n = i
 
-       if (k == l) exit
+         if (k == l) exit
 
-       j = k+1
+         j = k + 1
 
-    end do
-       
-  end subroutine str_to_vector
+      end do
 
-  !****
-      
-  subroutine str_to_double (str, x, ierr)
+   end subroutine str_to_vector
 
-    character(*), intent(in) :: str
-    real(dp), intent(out)    :: x
-    integer, intent(out)     :: ierr
+   !****
 
-    read(str, *, ROUND='COMPATIBLE', IOSTAT=ierr) x
+   subroutine str_to_double (str, x, ierr)
 
-  end subroutine str_to_double
-         
-  !****
+      character(*), intent(in) :: str
+      real(dp), intent(out) :: x
+      integer, intent(out) :: ierr
 
-  subroutine double_to_str (x, str)
+      read(str, *, ROUND = 'COMPATIBLE', IOSTAT = ierr) x
 
-    integer, parameter :: l=26
+   end subroutine str_to_double
 
-    real(dp), intent(in)          :: x
-    character(len=l), intent(out) :: str
+   !****
 
-    write(str, 100, ROUND='COMPATIBLE') x
-100 format(1PD26.16)
+   subroutine double_to_str (x, str)
 
-  end subroutine double_to_str
-  
+      integer, parameter :: l = 26
+
+      real(dp), intent(in) :: x
+      character(len = l), intent(out) :: str
+
+      write(str, 100, ROUND = 'COMPATIBLE') x
+      100 format(1PD26.16)
+
+   end subroutine double_to_str
+
 end module math_io

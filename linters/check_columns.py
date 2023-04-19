@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
+import glob
 import os
 import re
-import glob
 from collections.abc import MutableSet
 
 MESA_DIR = "../"
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
+
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
@@ -253,7 +254,7 @@ def check_history():
     if ENABLE_TEST_SUITE_HIST_CHECKS:
         # Value in each test case's history_columns.list but not in star/default/history_columns.list
         for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
+                os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
         ):
             test_case = get_history_columns(i.removeprefix(MESA_DIR))
             result = test_case - vals_history_list - known_false_positives
@@ -279,7 +280,6 @@ def get_profile_getval(filename="star/private/profile_getval.f90"):
 
 
 def get_profile_def(filename="star/private/star_profile_def.f90"):
-
     # extract column names from star_profile_def.f90
 
     # these lines look like:
@@ -440,11 +440,11 @@ def check_profile():
     if ENABLE_TEST_SUITE_PROF_CHECKS:
         # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
         for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
+                os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
         ):
             test_case = get_profile_columns(i.removeprefix(MESA_DIR))
             result = (
-                test_case - vals_profile_list - known_false_positives - general_info
+                    test_case - vals_profile_list - known_false_positives - general_info
             )
             if len(result):
                 print_section(

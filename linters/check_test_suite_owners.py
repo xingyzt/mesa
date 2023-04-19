@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 
 # Checks whether a test case has a owner and warns for test cases with only one owner
 

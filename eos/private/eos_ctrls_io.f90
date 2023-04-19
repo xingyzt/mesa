@@ -23,12 +23,12 @@
 !
 ! ***********************************************************************
 
-   module eos_ctrls_io
+module eos_ctrls_io
 
    use const_def
    use eos_def
    use math_lib
-   use utils_lib, only: mesa_error
+   use utils_lib, only : mesa_error
 
    implicit none
 
@@ -75,8 +75,8 @@
    real(dp) :: logRho_cut_FreeEOS_lo
    real(dp) :: logT_cut_FreeEOS_hi
    real(dp) :: logT_cut_FreeEOS_lo
-   character (len=30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
-         
+   character (len = 30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
+
    ! controls for CMS
    logical :: use_CMS, CMS_use_fixed_composition
    integer :: CMS_fixed_composition_index
@@ -110,7 +110,7 @@
    real(dp) :: mass_fraction_limit_for_Skye
    real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
    real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
-   character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
+   character(len = 128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
 
    logical :: use_simple_Skye_blends
    real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
@@ -120,13 +120,13 @@
    logical :: include_radiation, include_elec_pos
    logical :: eosDT_use_linear_interp_for_X
    logical :: eosDT_use_linear_interp_to_HELM
-   character(len=128) :: eosDT_file_prefix
+   character(len = 128) :: eosDT_file_prefix
    logical :: okay_to_convert_ierr_to_skip
    real(dp) :: tiny_fuzz
 
    ! other eos
    logical :: use_other_eos_component, use_other_eos_results
-   
+
    ! debugging
    logical :: dbg
    real(dp) :: logT_lo, logT_hi
@@ -135,25 +135,24 @@
    real(dp) :: Z_lo, Z_hi
 
    logical, dimension(max_extra_inlists) :: read_extra_eos_inlist
-   character (len=strlen), dimension(max_extra_inlists) :: extra_eos_inlist_name
+   character (len = strlen), dimension(max_extra_inlists) :: extra_eos_inlist_name
 
    ! User supplied inputs
    real(dp) :: eos_ctrl(10)
    integer :: eos_integer_ctrl(10)
    logical :: eos_logical_ctrl(10)
-   character(len=strlen) :: eos_character_ctrl(10)
-
+   character(len = strlen) :: eos_character_ctrl(10)
 
    namelist /eos/ &
       use_FreeEOS, &
-      
+
       ! controls for HELM
       Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
       logT_all_HELM, & ! all HELM for lgT >= this
       logT_low_all_HELM, & ! all HELM for lgT <= this
       coulomb_temp_cut_HELM, &
       coulomb_den_cut_HELM, &
-      
+
       ! controls for OPAL_SCVH
       use_OPAL_SCVH, &
       logT_low_all_SCVH, & ! SCVH for lgT >= this
@@ -164,7 +163,7 @@
       logQ_max_OPAL_SCVH, & ! no OPAL/SCVH for logQ > this
       logQ_min_OPAL_SCVH, & ! no OPAL/SCVH for logQ <= this.
       Z_all_OPAL, & ! all OPAL for Z <= this
-      
+
       ! controls for FreeEOS
       use_FreeEOS, &
       logQ_max_FreeEOS_hi, &
@@ -189,7 +188,7 @@
       logT_cut_FreeEOS_hi, &
       logT_cut_FreeEOS_lo, &
       suffix_for_FreeEOS_Z, &
-      
+
       ! controls for CMS
       use_CMS, CMS_use_fixed_composition, &
       CMS_fixed_composition_index, &
@@ -209,7 +208,7 @@
       logT_min_for_any_CMS, &      ! for lower blend zone in logT      
       logT_max_for_all_CMS_pure_He, &
       logT_max_for_any_CMS_pure_He, & ! upper logT blend zone is different for pure He
-      
+
       ! controls for PC
       use_PC, &
       mass_fraction_limit_for_PC, & ! skip any species with abundance < this
@@ -244,7 +243,7 @@
       eosDT_use_linear_interp_for_X, &
       eosDT_use_linear_interp_to_HELM, &
       eosDT_file_prefix, &
-      
+
       okay_to_convert_ierr_to_skip, &
       tiny_fuzz, &
 
@@ -257,61 +256,61 @@
       logRho_lo, logRho_hi, &
       X_lo, X_hi, &
       Z_lo, Z_hi, &
-      
-      read_extra_eos_inlist, extra_eos_inlist_name,&
 
-   ! User supplied inputs
+      read_extra_eos_inlist, extra_eos_inlist_name, &
+
+      ! User supplied inputs
       eos_ctrl, &
       eos_integer_ctrl, &
       eos_logical_ctrl, &
       eos_character_ctrl
 
 
-   contains
+contains
 
 
    ! read a "namelist" file and set parameters
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
-      character (len=*), intent(in) :: inlist
+      character (len = *), intent(in) :: inlist
       integer, intent(out) :: ierr ! 0 means AOK.
       type (EoS_General_Info), pointer :: rq
       integer :: iz, j
       include 'formats'
-      call get_eos_ptr(handle,rq,ierr)
+      call get_eos_ptr(handle, rq, ierr)
       if (ierr /= 0) return
       call set_default_controls
       call read_controls_file(rq, inlist, 1, ierr)
       if (ierr /= 0) return
       rq% Gamma_e_all_HELM = exp10(rq% log_Gamma_e_all_HELM)
       if (FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) /= 1d0) then
-         write(*,*) 'ERROR: expect FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) == 1d0'
-         call mesa_error(__FILE__,__LINE__,'init_eos_handle_data')
+         write(*, *) 'ERROR: expect FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) == 1d0'
+         call mesa_error(__FILE__, __LINE__, 'init_eos_handle_data')
       end if
    end subroutine read_namelist
 
 
    recursive subroutine read_controls_file(rq, filename, level, ierr)
-      use ISO_FORTRAN_ENV, only: IOSTAT_END
+      use ISO_FORTRAN_ENV, only : IOSTAT_END
       character(*), intent(in) :: filename
       type (EoS_General_Info), pointer :: rq
       integer, intent(in) :: level
       integer, intent(out) :: ierr
       logical, dimension(max_extra_inlists) :: read_extra
-      character (len=strlen) :: message
-      character (len=strlen), dimension(max_extra_inlists) :: extra
+      character (len = strlen) :: message
+      character (len = strlen), dimension(max_extra_inlists) :: extra
       integer :: unit, i
 
       ierr = 0
       if (level >= 10) then
-         write(*,*) 'ERROR: too many levels of nested extra controls inlist files'
+         write(*, *) 'ERROR: too many levels of nested extra controls inlist files'
          ierr = -1
          return
       end if
-      
+
       if (len_trim(filename) > 0) then
-         open(newunit=unit, file=trim(filename), &
-            action='read', delim='quote', status='old', iostat=ierr)
+         open(newunit = unit, file = trim(filename), &
+            action = 'read', delim = 'quote', status = 'old', iostat = ierr)
          if (ierr /= 0) then
             if (level == 1) then
                ierr = 0 ! no inlist file so just use defaults
@@ -321,7 +320,7 @@
             end if
             return
          end if
-         read(unit, nml=eos, iostat=ierr)
+         read(unit, nml = eos, iostat = ierr)
          close(unit)
          if (ierr == IOSTAT_END) then ! end-of-file means didn't find an &eos namelist
             ierr = 0
@@ -337,30 +336,29 @@
             write(*, '(a)') 'Failed while trying to read eos namelist file: ' // trim(filename)
             write(*, '(a)') 'Perhaps the following runtime error message will help you find the problem.'
             write(*, *)
-            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-            read(unit, nml=eos)
+            open(newunit = unit, file = trim(filename), action = 'read', delim = 'quote', status = 'old', iostat = ierr)
+            read(unit, nml = eos)
             close(unit)
             return
          end if
       end if
 
       call store_controls(rq)
-      
+
       if (len_trim(filename) == 0) return
 
       ! recursive calls to read other inlists
-      do i=1, max_extra_inlists
+      do i = 1, max_extra_inlists
          read_extra(i) = read_extra_eos_inlist(i)
          read_extra_eos_inlist(i) = .false.
          extra(i) = extra_eos_inlist_name(i)
          extra_eos_inlist_name(i) = 'undefined'
-   
+
          if (read_extra(i)) then
-            call read_controls_file(rq, extra(i), level+1, ierr)
+            call read_controls_file(rq, extra(i), level + 1, ierr)
             if (ierr /= 0) return
          end if
       end do
-
 
    end subroutine read_controls_file
 
@@ -377,7 +375,7 @@
       rq% logT_all_HELM = logT_all_HELM
       rq% logT_low_all_HELM = logT_low_all_HELM
       rq% coulomb_temp_cut_HELM = coulomb_temp_cut_HELM
-      rq% coulomb_den_cut_HELM = coulomb_den_cut_HELM      
+      rq% coulomb_den_cut_HELM = coulomb_den_cut_HELM
       ! controls for OPAL_SCVH
       rq% use_OPAL_SCVH = use_OPAL_SCVH
       rq% logT_low_all_SCVH = logT_low_all_SCVH
@@ -387,7 +385,7 @@
       rq% logRho_min_OPAL_SCVH_limit = logRho_min_OPAL_SCVH_limit
       rq% logQ_max_OPAL_SCVH = logQ_max_OPAL_SCVH
       rq% logQ_min_OPAL_SCVH = logQ_min_OPAL_SCVH
-      rq% Z_all_OPAL = Z_all_OPAL      
+      rq% Z_all_OPAL = Z_all_OPAL
       ! controls for FreeEOS
       rq% use_FreeEOS = use_FreeEOS
       rq% logQ_max_FreeEOS_hi = logQ_max_FreeEOS_hi
@@ -412,7 +410,7 @@
       rq% logT_cut_FreeEOS_hi = logT_cut_FreeEOS_hi
       rq% logT_cut_FreeEOS_lo = logT_cut_FreeEOS_lo
       rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs) = &
-         suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
+         suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)
       ! controls for CMS
       rq% use_CMS = use_CMS
       rq% CMS_use_fixed_composition = CMS_use_fixed_composition
@@ -432,7 +430,7 @@
       rq% logT_min_for_all_CMS = logT_min_for_all_CMS
       rq% logT_min_for_any_CMS = logT_min_for_any_CMS
       rq% logT_max_for_all_CMS_pure_He = logT_max_for_all_CMS_pure_He
-      rq% logT_max_for_any_CMS_pure_He = logT_max_for_any_CMS_pure_He      
+      rq% logT_max_for_any_CMS_pure_He = logT_max_for_any_CMS_pure_He
       ! controls for PC
       rq% use_PC = use_PC
       rq% mass_fraction_limit_for_PC = mass_fraction_limit_for_PC
@@ -462,8 +460,8 @@
       rq% include_radiation = include_radiation
       rq% include_elec_pos = include_elec_pos
       rq% eosDT_use_linear_interp_for_X = eosDT_use_linear_interp_for_X
-      rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM      
-      rq% eosDT_file_prefix = eosDT_file_prefix      
+      rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM
+      rq% eosDT_file_prefix = eosDT_file_prefix
       rq% okay_to_convert_ierr_to_skip = okay_to_convert_ierr_to_skip
       rq% tiny_fuzz = tiny_fuzz
 
@@ -493,22 +491,22 @@
    subroutine write_namelist(handle, filename, ierr)
       integer, intent(in) :: handle
       character(*), intent(in) :: filename
-      integer, intent(out) :: ierr 
+      integer, intent(out) :: ierr
       type (EoS_General_Info), pointer :: rq
       integer :: iounit
-      open(newunit=iounit, file=trim(filename), &
-         action='write', status='replace', iostat=ierr)
+      open(newunit = iounit, file = trim(filename), &
+         action = 'write', status = 'replace', iostat = ierr)
       if (ierr /= 0) then
-         write(*,*) 'failed to open ' // trim(filename)
+         write(*, *) 'failed to open ' // trim(filename)
          return
       endif
-      call get_eos_ptr(handle,rq,ierr)
+      call get_eos_ptr(handle, rq, ierr)
       if (ierr /= 0) then
          close(iounit)
          return
-      end if      
-      call set_controls_for_writing(rq)      
-      write(iounit, nml=eos, iostat=ierr)
+      end if
+      call set_controls_for_writing(rq)
+      write(iounit, nml = eos, iostat = ierr)
       close(iounit)
    end subroutine write_namelist
 
@@ -520,7 +518,7 @@
       logT_all_HELM = rq% logT_all_HELM
       logT_low_all_HELM = rq% logT_low_all_HELM
       coulomb_temp_cut_HELM = rq% coulomb_temp_cut_HELM
-      coulomb_den_cut_HELM = rq% coulomb_den_cut_HELM      
+      coulomb_den_cut_HELM = rq% coulomb_den_cut_HELM
       ! controls for OPAL_SCVH
       use_OPAL_SCVH = rq% use_OPAL_SCVH
       logT_low_all_SCVH = rq% logT_low_all_SCVH
@@ -530,7 +528,7 @@
       logRho_min_OPAL_SCVH_limit = rq% logRho_min_OPAL_SCVH_limit
       logQ_max_OPAL_SCVH = rq% logQ_max_OPAL_SCVH
       logQ_min_OPAL_SCVH = rq% logQ_min_OPAL_SCVH
-      Z_all_OPAL = rq% Z_all_OPAL      
+      Z_all_OPAL = rq% Z_all_OPAL
       ! controls for FreeEOS
       use_FreeEOS = rq% use_FreeEOS
       logQ_max_FreeEOS_hi = rq% logQ_max_FreeEOS_hi
@@ -555,7 +553,7 @@
       logT_cut_FreeEOS_hi = rq% logT_cut_FreeEOS_hi
       logT_cut_FreeEOS_lo = rq% logT_cut_FreeEOS_lo
       suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs) = &
-         rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
+         rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)
       ! controls for CMS
       use_CMS = rq% use_CMS
       CMS_use_fixed_composition = rq% CMS_use_fixed_composition
@@ -575,7 +573,7 @@
       logT_min_for_all_CMS = rq% logT_min_for_all_CMS
       logT_min_for_any_CMS = rq% logT_min_for_any_CMS
       logT_max_for_all_CMS_pure_He = rq% logT_max_for_all_CMS_pure_He
-      logT_max_for_any_CMS_pure_He = rq% logT_max_for_any_CMS_pure_He      
+      logT_max_for_any_CMS_pure_He = rq% logT_max_for_any_CMS_pure_He
       ! controls for PC
       use_PC = rq% use_PC
       mass_fraction_limit_for_PC = rq% mass_fraction_limit_for_PC
@@ -591,9 +589,9 @@
       ! controls for Skye
       use_Skye = rq% use_Skye
       Skye_use_ion_offsets = rq% Skye_use_ion_offsets
-      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
+      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye
       Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
-      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid  
+      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid
       Skye_solid_mixing_rule = rq% Skye_solid_mixing_rule
       use_simple_Skye_blends = rq% use_simple_Skye_blends
       logRho_min_for_any_Skye = rq% logRho_min_for_any_Skye
@@ -605,8 +603,8 @@
       include_radiation = rq% include_radiation
       include_elec_pos = rq% include_elec_pos
       eosDT_use_linear_interp_for_X = rq% eosDT_use_linear_interp_for_X
-      eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM      
-      eosDT_file_prefix = rq% eosDT_file_prefix      
+      eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM
+      eosDT_file_prefix = rq% eosDT_file_prefix
       okay_to_convert_ierr_to_skip = rq% okay_to_convert_ierr_to_skip
       tiny_fuzz = rq% tiny_fuzz
 
@@ -631,18 +629,18 @@
       Z_lo = rq% Z_lo
       Z_hi = rq% Z_hi
    end subroutine set_controls_for_writing
-   
+
 
    subroutine get_eos_controls(rq, name, val, ierr)
-      use utils_lib, only: StrUpCase
+      use utils_lib, only : StrUpCase
       type (EoS_General_Info), pointer :: rq
-      character(len=*),intent(in) :: name
-      character(len=*), intent(out) :: val
+      character(len = *), intent(in) :: name
+      character(len = *), intent(out) :: val
       integer, intent(out) :: ierr
 
-      character(len(name)+1) :: upper_name
-      character(len=512) :: str
-      integer :: iounit,iostat,ind,i
+      character(len(name) + 1) :: upper_name
+      character(len = 512) :: str
+      integer :: iounit, iostat, ind, i
 
       ierr = 0
 
@@ -651,28 +649,28 @@
       call set_controls_for_writing(rq)
 
       ! Write namelist to temporay file
-      open(newunit=iounit,status='scratch')
-      write(iounit,nml=eos)
+      open(newunit = iounit, status = 'scratch')
+      write(iounit, nml = eos)
       rewind(iounit)
 
       ! Namelists get written in captials
-      upper_name = trim(StrUpCase(name))//'='
+      upper_name = trim(StrUpCase(name)) // '='
       val = ''
       ! Search for name inside namelist
-      do 
-         read(iounit,'(A)',iostat=iostat) str
-         ind = index(trim(str),trim(upper_name))
-         if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
-            do i=1,len(val)
+      do
+         read(iounit, '(A)', iostat = iostat) str
+         ind = index(trim(str), trim(upper_name))
+         if(ind /= 0) then
+            val = str(ind + len_trim(upper_name):len_trim(str) - 1) ! Remove final comma and starting =
+            do i = 1, len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
-      if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+      if(len_trim(val) == 0 .and. ind==0) ierr = -1
 
       close(iounit)
 
@@ -680,8 +678,8 @@
 
    subroutine set_eos_controls(rq, name, val, ierr)
       type (EoS_General_Info), pointer :: rq
-      character(len=*), intent(in) :: name, val
-      character(len=len(name)+len(val)+8) :: tmp
+      character(len = *), intent(in) :: name, val
+      character(len = len(name) + len(val) + 8) :: tmp
       integer, intent(out) :: ierr
 
       ierr = 0
@@ -689,11 +687,11 @@
       ! First save current eos_controls
       call set_controls_for_writing(rq)
 
-      tmp=''
-      tmp = '&eos '//trim(name)//'='//trim(val)//' /'
+      tmp = ''
+      tmp = '&eos ' // trim(name) // '=' // trim(val) // ' /'
 
       ! Load into namelist
-      read(tmp, nml=eos)
+      read(tmp, nml = eos)
 
       ! Add to eos
       call store_controls(rq)
@@ -702,5 +700,5 @@
    end subroutine set_eos_controls
 
 
-   end module eos_ctrls_io
+end module eos_ctrls_io
 

@@ -25,264 +25,264 @@
 
 module math_lib
 
-  ! Uses
+   ! Uses
 
-  use const_lib, only: dp
+   use const_lib, only : dp
 
-  use math_pown
-  use math_io
-  use utils_lib
-  use math_def
+   use math_pown
+   use math_io
+   use utils_lib
+   use math_def
 
-  use crmath
+   use crmath
 
-  use IEEE_ARITHMETIC
+   use IEEE_ARITHMETIC
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Parameter definitions
+   ! Parameter definitions
 
-  character(LEN=16), parameter :: MATH_BACKEND = 'CRMATH'
+   character(LEN = 16), parameter :: MATH_BACKEND = 'CRMATH'
 
-  ! Module variables
+   ! Module variables
 
-  real(dp), save :: ln10_m
+   real(dp), save :: ln10_m
 
-  ! Interfaces
+   ! Interfaces
 
-  interface safe_sqrt
-     module procedure safe_sqrt_
-  end interface safe_sqrt
+   interface safe_sqrt
+      module procedure safe_sqrt_
+   end interface safe_sqrt
 
-  interface safe_log
-     module procedure safe_log_
-  end interface safe_log
+   interface safe_log
+      module procedure safe_log_
+   end interface safe_log
 
-  interface safe_log10
-     module procedure safe_log10_
-  end interface safe_log10
+   interface safe_log10
+      module procedure safe_log10_
+   end interface safe_log10
 
-  interface exp10
-     module procedure exp10_
-  end interface exp10
+   interface exp10
+      module procedure exp10_
+   end interface exp10
 
-  interface pow
-     module procedure pow_i_
-     module procedure pow_r_
-  end interface pow
+   interface pow
+      module procedure pow_i_
+      module procedure pow_r_
+   end interface pow
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
+   private
 
-  public :: MATH_BACKEND
+   public :: MATH_BACKEND
 
-  public :: math_init
-  public :: safe_sqrt
-  public :: log
-  public :: safe_log
-  public :: log10
-  public :: safe_log10
-  public :: log1p
-  public :: log2
-  public :: exp
-  public :: exp10
-  public :: expm1
-  public :: powm1
-  public :: pow
-  public :: pow2
-  public :: pow3
-  public :: pow4
-  public :: pow5
-  public :: pow6
-  public :: pow7
-  public :: pow8
-  public :: cos
-  public :: sin
-  public :: tan
-  public :: cospi
-  public :: sinpi
-  public :: tanpi
-  public :: acos
-  public :: asin
-  public :: atan
-  public :: acospi
-  public :: asinpi
-  public :: atanpi
-  public :: cosh
-  public :: sinh
-  public :: tanh
-  public :: acosh
-  public :: asinh
-  public :: atanh
-  public :: str_to_vector
-  public :: str_to_double
-  public :: double_to_str
+   public :: math_init
+   public :: safe_sqrt
+   public :: log
+   public :: safe_log
+   public :: log10
+   public :: safe_log10
+   public :: log1p
+   public :: log2
+   public :: exp
+   public :: exp10
+   public :: expm1
+   public :: powm1
+   public :: pow
+   public :: pow2
+   public :: pow3
+   public :: pow4
+   public :: pow5
+   public :: pow6
+   public :: pow7
+   public :: pow8
+   public :: cos
+   public :: sin
+   public :: tan
+   public :: cospi
+   public :: sinpi
+   public :: tanpi
+   public :: acos
+   public :: asin
+   public :: atan
+   public :: acospi
+   public :: asinpi
+   public :: atanpi
+   public :: cosh
+   public :: sinh
+   public :: tanh
+   public :: acosh
+   public :: asinh
+   public :: atanh
+   public :: str_to_vector
+   public :: str_to_double
+   public :: double_to_str
 
-  ! Procedures
+   ! Procedures
 
 contains
 
-  subroutine math_init ()
+   subroutine math_init ()
 
-    call crmath_init()
+      call crmath_init()
 
-    ln10_m = log(10._dp)
+      ln10_m = log(10._dp)
 
-    call precompute_some_zs()
+      call precompute_some_zs()
 
-  end subroutine math_init
+   end subroutine math_init
 
-  !****
+   !****
 
-  elemental function safe_sqrt_ (x) result (sqrt_x)
+   elemental function safe_sqrt_ (x) result (sqrt_x)
 
-    real(dp), intent(in) :: x
-    real(dp)             :: sqrt_x
+      real(dp), intent(in) :: x
+      real(dp) :: sqrt_x
 
-    sqrt_x = SQRT(MAX(x, 0._dp))
+      sqrt_x = SQRT(MAX(x, 0._dp))
 
-  end function safe_sqrt_
-  
-  !****
+   end function safe_sqrt_
 
-  elemental function safe_log_ (x) result (log_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log_x
+   elemental function safe_log_ (x) result (log_x)
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+      real(dp), intent(in) :: x
+      real(dp) :: log_x
 
-       log_x = -99._dp
+      if (.NOT. IEEE_IS_FINITE(x)) then
 
-    else
+         log_x = -99._dp
 
-       log_x = log(MAX(1.E-99_dp, x))
+      else
 
-    end if
+         log_x = log(MAX(1.E-99_dp, x))
 
-  end function safe_log_
+      end if
 
-  !****
+   end function safe_log_
 
-  elemental function safe_log10_ (x) result (log10_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log10_x
+   elemental function safe_log10_ (x) result (log10_x)
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+      real(dp), intent(in) :: x
+      real(dp) :: log10_x
 
-       log10_x = -99._dp
+      if (.NOT. IEEE_IS_FINITE(x)) then
 
-    else
+         log10_x = -99._dp
 
-       log10_x = log10(MAX(1.E-99_dp, x))
+      else
 
-    end if
+         log10_x = log10(MAX(1.E-99_dp, x))
 
-  end function safe_log10_
+      end if
 
-  !****
+   end function safe_log10_
 
-  elemental function exp10_ (x) result (exp10_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: exp10_x
+   elemental function exp10_ (x) result (exp10_x)
 
-    integer :: ix
-    integer :: i
+      real(dp), intent(in) :: x
+      real(dp) :: exp10_x
 
-    ix = FLOOR(x)
+      integer :: ix
+      integer :: i
 
-    if (x == ix) then ! integer power of 10
+      ix = FLOOR(x)
 
-       exp10_x = 1._dp
+      if (x == ix) then ! integer power of 10
 
-       do i = 1, ABS(ix)
-          exp10_x = exp10_x*10._dp
-       end do
-       
-       if (ix < 0) exp10_x = 1._dp/exp10_x
+         exp10_x = 1._dp
 
-    else
+         do i = 1, ABS(ix)
+            exp10_x = exp10_x * 10._dp
+         end do
 
-       exp10_x = exp(x*ln10_m)
+         if (ix < 0) exp10_x = 1._dp / exp10_x
 
-    endif
+      else
 
-  end function exp10_
+         exp10_x = exp(x * ln10_m)
 
-  !****
+      endif
 
-  elemental function pow_i_ (x, iy) result (pow_x)
+   end function exp10_
 
-    real(dp), intent(in) :: x
-    integer, intent(in)  :: iy
-    real(dp)             :: pow_x
+   !****
 
-    integer :: i
-    
-    if (x == 0._dp) then
+   elemental function pow_i_ (x, iy) result (pow_x)
 
-       pow_x = 0._dp
+      real(dp), intent(in) :: x
+      integer, intent(in) :: iy
+      real(dp) :: pow_x
 
-    else
+      integer :: i
 
-       pow_x = 1._dp
-          
-       do i = 1, ABS(iy)
-          pow_x = pow_x*x
-       end do
+      if (x == 0._dp) then
 
-       if (iy < 0) pow_x = 1._dp/pow_x
-          
-    endif
+         pow_x = 0._dp
 
-  end function pow_i_
+      else
 
-  !****
+         pow_x = 1._dp
 
-  elemental function pow_r_ (x, y) result (pow_x)
+         do i = 1, ABS(iy)
+            pow_x = pow_x * x
+         end do
 
-    real(dp), intent(in) :: x
-    real(dp), intent(in) :: y
-    real(dp)             :: pow_x
+         if (iy < 0) pow_x = 1._dp / pow_x
 
-    integer :: iy
-    integer :: i
-    
-    if (x == 0._dp) then
+      endif
 
-       pow_x = 0._dp
+   end function pow_i_
 
-    else
+   !****
 
-       iy = floor(y)
+   elemental function pow_r_ (x, y) result (pow_x)
 
-       if (y == iy .AND. ABS(iy) < 100) then ! integer power of x
+      real(dp), intent(in) :: x
+      real(dp), intent(in) :: y
+      real(dp) :: pow_x
 
-          pow_x = 1._dp
-          
-          do i = 1, ABS(iy)
-             pow_x = pow_x*x
-          end do
+      integer :: iy
+      integer :: i
 
-          if (iy < 0) pow_x = 1._dp/pow_x
-          
-       else
+      if (x == 0._dp) then
 
-          pow_x = exp(log(x)*y)
+         pow_x = 0._dp
 
-       end if
+      else
 
-    end if
+         iy = floor(y)
 
-  end function pow_r_
+         if (y == iy .AND. ABS(iy) < 100) then ! integer power of x
+
+            pow_x = 1._dp
+
+            do i = 1, ABS(iy)
+               pow_x = pow_x * x
+            end do
+
+            if (iy < 0) pow_x = 1._dp / pow_x
+
+         else
+
+            pow_x = exp(log(x) * y)
+
+         end if
+
+      end if
+
+   end function pow_r_
 
 
-  include 'precompute_zs.inc'
+include 'precompute_zs.inc'
 
 
 end module math_lib

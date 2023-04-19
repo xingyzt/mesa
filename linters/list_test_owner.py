@@ -1,5 +1,3 @@
-import os
-import glob
 from collections import defaultdict
 
 import check_test_suite_owners as cc
@@ -11,7 +9,6 @@ codeowner = cc.parse_codeowners(cc.CODEOWNERS)
 
 
 def list_by_author(codeowner):
-
     result = defaultdict(list)
 
     for module in ["star", "binary", "astero"]:

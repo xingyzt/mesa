@@ -31,17 +31,17 @@ module star_pgstar
 
    implicit none
 
-      ! pgstar data
+   ! pgstar data
 
    abstract interface
-      
+
       subroutine pgstar_plot_interface(id, device_id, ierr)
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
       end subroutine pgstar_plot_interface
 
-      subroutine other_do_plot_in_grid_interface( &
-            id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)
+      subroutine other_do_plot_in_grid_interface(&
+         id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          integer, intent(out) :: ierr
@@ -50,7 +50,7 @@ module star_pgstar
       subroutine pgstar_decorator_interface(id, xmin, xmax, ymin, ymax, plot_num, ierr)
          integer, intent(in) :: id
          !Not doubles
-         real, intent(in) :: xmin, xmax, ymin, ymax 
+         real, intent(in) :: xmin, xmax, ymin, ymax
          integer, intent(in) :: plot_num
          integer, intent(out) :: ierr
       end subroutine pgstar_decorator_interface
@@ -59,14 +59,14 @@ module star_pgstar
 
    type pgstar_win_file_data
       integer :: id
-      character (len=64) :: name
+      character (len = 64) :: name
       logical :: win_flag, file_flag, do_win, do_file
       integer :: id_win, id_file, file_interval
       real :: win_width, prev_win_width
       real :: win_aspect_ratio, prev_win_aspect_ratio
       real :: file_width, file_aspect_ratio
-      character (len=strlen) :: file_dir, file_prefix, most_recent_filename
-      character (len=strlen) :: file_dir_for_previous_mkdir
+      character (len = strlen) :: file_dir, file_prefix, most_recent_filename
+      character (len = strlen) :: file_dir_for_previous_mkdir
       logical :: have_called_mkdir
       procedure (pgstar_plot_interface), pointer, nopass :: plot => null()
       ! the following make it possible to use "other" plots in grids
@@ -80,9 +80,8 @@ module star_pgstar
       integer :: step
       real(dp), pointer :: vals(:) => null() ! values of items in history_columns list
       type (pgstar_hist_node), pointer :: next => null()
-         ! list kept in strictly decreasing order by age & step
-   end type pgstar_hist_node  
-
+      ! list kept in strictly decreasing order by age & step
+   end type pgstar_hist_node
 
    integer, parameter :: max_Abundance_num_isos_to_show = 1000
 
@@ -223,74 +222,73 @@ module star_pgstar
 
    integer, parameter :: max_num_pgstar_trace_history_values = 20
 
-
    type pgstar_controls
       include "pgstar_controls.inc"
 
       procedure(pgstar_decorator_interface), pointer, nopass :: &
-            Abundance_pgstar_decorator => null(), &
-            Color_Magnitude1_pgstar_decorator => null(), &
-            Color_Magnitude2_pgstar_decorator => null(), &
-            Color_Magnitude3_pgstar_decorator => null(), &
-            Color_Magnitude4_pgstar_decorator => null(), &
-            Color_Magnitude5_pgstar_decorator => null(), &
-            Color_Magnitude6_pgstar_decorator => null(), &
-            Color_Magnitude7_pgstar_decorator => null(), &
-            Color_Magnitude8_pgstar_decorator => null(), &
-            Color_Magnitude9_pgstar_decorator => null(), &
-            dPg_dnu_pgstar_decorator => null(), &
-            Dynamo_pgstar_decorator => null(), &
-            History_Panels1_pgstar_decorator => null(), &
-            History_Panels2_pgstar_decorator => null(), &
-            History_Panels3_pgstar_decorator => null(), &
-            History_Panels4_pgstar_decorator => null(), &
-            History_Panels5_pgstar_decorator => null(), &
-            History_Panels6_pgstar_decorator => null(), &
-            History_Panels7_pgstar_decorator => null(), &
-            History_Panels8_pgstar_decorator => null(), &
-            History_Panels9_pgstar_decorator => null(), &
-            History_Track1_pgstar_decorator => null(), &
-            History_Track2_pgstar_decorator => null(), &
-            History_Track3_pgstar_decorator => null(), &
-            History_Track4_pgstar_decorator => null(), &
-            History_Track5_pgstar_decorator => null(), &
-            History_Track6_pgstar_decorator => null(), &
-            History_Track7_pgstar_decorator => null(), &
-            History_Track8_pgstar_decorator => null(), &
-            History_Track9_pgstar_decorator => null(), &
-            HR_pgstar_decorator => null(), &
-            Kipp_pgstar_decorator => null(), &
-            logg_logt_pgstar_decorator => null(), &
-            logg_teff_pgstar_decorator => null(), &
-            logl_r_pgstar_decorator => null(), &
-            logl_teff_pgstar_decorator => null(), &
-            logl_v_pgstar_decorator => null(), &
-            l_r_pgstar_decorator => null(), &
-            l_teff_pgstar_decorator => null(), &
-            l_v_pgstar_decorator => null(), &
-            mixing_pgstar_decorator => null(), &
-            mode_prop_pgstar_decorator => null(), &
-            network_pgstar_decorator => null(), &
-            power_pgstar_decorator => null(), &
-            production_pgstar_decorator => null(), &
-            Profile_Panels1_pgstar_decorator => null(), &
-            Profile_Panels2_pgstar_decorator => null(), &
-            Profile_Panels3_pgstar_decorator => null(), &
-            Profile_Panels4_pgstar_decorator => null(), &
-            Profile_Panels5_pgstar_decorator => null(), &
-            Profile_Panels6_pgstar_decorator => null(), &
-            Profile_Panels7_pgstar_decorator => null(), &
-            Profile_Panels8_pgstar_decorator => null(), &
-            Profile_Panels9_pgstar_decorator => null(), &
-            R_L_pgstar_decorator => null(), &
-            R_Teff_pgstar_decorator => null(), &
-            rti_pgstar_decorator => null(), &
-            summary_burn_pgstar_decorator => null(), &
-            summary_profile_pgstar_decorator => null(), &
-            summary_history_pgstar_decorator => null(), &
-            trho_pgstar_decorator => null(), &
-            tmaxrho_pgstar_decorator => null(), &
-            trho_profile_pgstar_decorator => null()
+         Abundance_pgstar_decorator => null(), &
+         Color_Magnitude1_pgstar_decorator => null(), &
+         Color_Magnitude2_pgstar_decorator => null(), &
+         Color_Magnitude3_pgstar_decorator => null(), &
+         Color_Magnitude4_pgstar_decorator => null(), &
+         Color_Magnitude5_pgstar_decorator => null(), &
+         Color_Magnitude6_pgstar_decorator => null(), &
+         Color_Magnitude7_pgstar_decorator => null(), &
+         Color_Magnitude8_pgstar_decorator => null(), &
+         Color_Magnitude9_pgstar_decorator => null(), &
+         dPg_dnu_pgstar_decorator => null(), &
+         Dynamo_pgstar_decorator => null(), &
+         History_Panels1_pgstar_decorator => null(), &
+         History_Panels2_pgstar_decorator => null(), &
+         History_Panels3_pgstar_decorator => null(), &
+         History_Panels4_pgstar_decorator => null(), &
+         History_Panels5_pgstar_decorator => null(), &
+         History_Panels6_pgstar_decorator => null(), &
+         History_Panels7_pgstar_decorator => null(), &
+         History_Panels8_pgstar_decorator => null(), &
+         History_Panels9_pgstar_decorator => null(), &
+         History_Track1_pgstar_decorator => null(), &
+         History_Track2_pgstar_decorator => null(), &
+         History_Track3_pgstar_decorator => null(), &
+         History_Track4_pgstar_decorator => null(), &
+         History_Track5_pgstar_decorator => null(), &
+         History_Track6_pgstar_decorator => null(), &
+         History_Track7_pgstar_decorator => null(), &
+         History_Track8_pgstar_decorator => null(), &
+         History_Track9_pgstar_decorator => null(), &
+         HR_pgstar_decorator => null(), &
+         Kipp_pgstar_decorator => null(), &
+         logg_logt_pgstar_decorator => null(), &
+         logg_teff_pgstar_decorator => null(), &
+         logl_r_pgstar_decorator => null(), &
+         logl_teff_pgstar_decorator => null(), &
+         logl_v_pgstar_decorator => null(), &
+         l_r_pgstar_decorator => null(), &
+         l_teff_pgstar_decorator => null(), &
+         l_v_pgstar_decorator => null(), &
+         mixing_pgstar_decorator => null(), &
+         mode_prop_pgstar_decorator => null(), &
+         network_pgstar_decorator => null(), &
+         power_pgstar_decorator => null(), &
+         production_pgstar_decorator => null(), &
+         Profile_Panels1_pgstar_decorator => null(), &
+         Profile_Panels2_pgstar_decorator => null(), &
+         Profile_Panels3_pgstar_decorator => null(), &
+         Profile_Panels4_pgstar_decorator => null(), &
+         Profile_Panels5_pgstar_decorator => null(), &
+         Profile_Panels6_pgstar_decorator => null(), &
+         Profile_Panels7_pgstar_decorator => null(), &
+         Profile_Panels8_pgstar_decorator => null(), &
+         Profile_Panels9_pgstar_decorator => null(), &
+         R_L_pgstar_decorator => null(), &
+         R_Teff_pgstar_decorator => null(), &
+         rti_pgstar_decorator => null(), &
+         summary_burn_pgstar_decorator => null(), &
+         summary_profile_pgstar_decorator => null(), &
+         summary_history_pgstar_decorator => null(), &
+         trho_pgstar_decorator => null(), &
+         tmaxrho_pgstar_decorator => null(), &
+         trho_profile_pgstar_decorator => null()
 
    end type pgstar_controls
 

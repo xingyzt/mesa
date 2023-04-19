@@ -8,7 +8,7 @@ module skye_thermodynamics
 
    public :: compute_derived_quantities, pack_for_export, thermodynamics_from_free_energy
 
-   contains
+contains
 
    !> Computes the entropy, internal energy, and pressure of a system
    !! given its free energy, temperature, and density.
@@ -56,7 +56,7 @@ module skye_thermodynamics
    !! @param nabad Adiabatic gradient (dlnT/dlnP at constant entropy)
    !! @param cs Sound speed (cm/s)
    subroutine compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
-      use const_def, only: clight
+      use const_def, only : clight
       type(auto_diff_real_2var_order3), intent(in) :: temp, dens, s, e, p
       type(auto_diff_real_2var_order3), intent(out) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
 
@@ -101,7 +101,7 @@ module skye_thermodynamics
    !! @param d_dlnRho The derivative of the EOS return vector with respect to lnRho.
    !! @param d_dlnT The derivative of the EOS return vector with respect to lnT.
    subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele, abar, zbar, &
-                                          phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
+      phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
       use eos_def
       type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele
       type(auto_diff_real_2var_order3), intent(in) :: phase, latent_ddlnT, latent_ddlnRho
@@ -131,7 +131,7 @@ module skye_thermodynamics
       e = erad + egas
       s = srad + sgas
 
-      if(s<0 .or. e<0 .or. pgas <0 ) then
+      if(s<0 .or. e<0 .or. pgas <0) then
          ierr = -1
          return
       end if
@@ -139,11 +139,10 @@ module skye_thermodynamics
       lnS = log(s)
       lnE = log(e)
       lnPgas = log(pgas)
-      
+
       ! assuming complete ionization
       mu = abar / (1d0 + zbar)
-      lnfree_e = log(max(1d-99, xnefer)/(avo*dens))
-
+      lnfree_e = log(max(1d-99, xnefer) / (avo * dens))
 
       call compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
 
@@ -185,7 +184,7 @@ module skye_thermodynamics
       d_dlnT(i_eta) = etaele%d1val1 * temp%val
       d_dlnT(i_phase) = phase%d1val1 * temp%val
       d_dlnT(i_latent_ddlnT) = latent_ddlnT%d1val1 * temp%val
-      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val     
+      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val
 
       d_dlnRho(i_lnS) = lnS%d1val2 * dens%val
       d_dlnRho(i_lnE) = lnE%d1val2 * dens%val
@@ -208,7 +207,6 @@ module skye_thermodynamics
       d_dlnRho(i_latent_ddlnRho) = latent_ddlnRho%d1val2 * dens%val
 
    end subroutine pack_for_export
-
 
 
 end module skye_thermodynamics

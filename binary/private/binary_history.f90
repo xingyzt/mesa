@@ -163,7 +163,7 @@ contains
          write(*, *) 'WARNING: do not have any output specified for binary logs.'
          return
       end if
-!      write(*, *) " got num of cols"
+      !      write(*, *) " got num of cols"
       if (b% number_of_binary_history_columns < 0) then
          b% number_of_binary_history_columns = n
       else if (b% number_of_binary_history_columns /= n) then
@@ -222,7 +222,7 @@ contains
       else
          nullify(is_int)
       end if
-!      write(*, *) " associated arrays"
+      !      write(*, *) " associated arrays"
 
       nullify(extra_col_names)
       nullify(extra_col_vals)
@@ -249,7 +249,7 @@ contains
          end do
       end if
 
-!      write(*, *) " starting write loop ", write_flag
+      !      write(*, *) " starting write loop ", write_flag
       i0 = 1
       if (write_flag .and. (open_close_log .or. b% s_donor% model_number == -100)) then
          fname = trim(b% log_directory) // '/' // trim(b% history_name)
@@ -322,7 +322,7 @@ contains
 
       do i = i0, 3 ! add a row to the log
          col = 0
-!         write(*, *) "doing cols pass", i
+         !         write(*, *) "doing cols pass", i
          do j = 1, numcols
             call do_col(i, j)
          end do
@@ -331,16 +331,16 @@ contains
          end do
          if (write_flag) write(io, *)
       end do
-!      write (*, *) "cols handled"
+      !      write (*, *) "cols handled"
       if (open_close_log) close(io)
 
       call dealloc
-!      write(*, *) "history written"
+      !      write(*, *) "history written"
 
       b% model_number_of_binary_history_values = b% model_number
 
       if (b% need_to_set_binary_history_names_etc) then
-!         write(*, *) " creating hash of the history dict"
+         !         write(*, *) " creating hash of the history dict"
          call integer_dict_create_hash(b% binary_history_names_dict, ierr)
          if (ierr /= 0) then
             write(*, *) "hash failed"
@@ -374,7 +374,7 @@ contains
 
 
       subroutine do_name(j, col_name)
-         use utils_lib, only: integer_dict_define
+         use utils_lib, only : integer_dict_define
          integer, intent(in) :: j
          character (len = *), intent(in) :: col_name
          if (write_flag) write(io, fmt = txt_fmt, advance = 'no') trim(col_name)

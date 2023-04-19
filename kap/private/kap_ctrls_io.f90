@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-   module kap_ctrls_io
+module kap_ctrls_io
 
    use const_def
    use kap_def
@@ -38,27 +38,26 @@
 
    integer :: kap_option, kap_CO_option, kap_lowT_option
 
-   character(len=strlen) :: kap_file_prefix, kap_CO_prefix, kap_lowT_prefix
+   character(len = strlen) :: kap_file_prefix, kap_CO_prefix, kap_lowT_prefix
 
    ! user table info
    integer :: user_num_kap_Xs = 0
    real(dp), dimension(kap_max_dim) :: user_kap_Xs = -1d0
    integer :: user_num_kap_Zs = 0
-   real(dp), dimension(kap_max_dim) :: user_kap_Zs= -1d0
+   real(dp), dimension(kap_max_dim) :: user_kap_Zs = -1d0
    integer, dimension(kap_max_dim) :: user_num_kap_Xs_for_this_Z = 0
 
    integer :: user_num_kap_CO_Xs = 0
    real(dp), dimension(kap_max_dim) :: user_kap_CO_Xs = -1d0
    integer :: user_num_kap_CO_Zs = 0
-   real(dp), dimension(kap_max_dim) :: user_kap_CO_Zs= -1d0
+   real(dp), dimension(kap_max_dim) :: user_kap_CO_Zs = -1d0
    integer, dimension(kap_max_dim) :: user_num_kap_CO_Xs_for_this_Z = 0
 
    integer :: user_num_kap_lowT_Xs = 0
    real(dp), dimension(kap_max_dim) :: user_kap_lowT_Xs = -1d0
    integer :: user_num_kap_lowT_Zs = 0
-   real(dp), dimension(kap_max_dim) :: user_kap_lowT_Zs= -1d0
+   real(dp), dimension(kap_max_dim) :: user_kap_lowT_Zs = -1d0
    integer, dimension(kap_max_dim) :: user_num_kap_lowT_Xs_for_this_Z = 0
-
 
    real(dp) :: kap_blend_logT_upper_bdy, kap_blend_logT_lower_bdy
 
@@ -87,17 +86,17 @@
    real(dp) :: Z_lo, Z_hi
 
    logical, dimension(max_extra_inlists) :: read_extra_kap_inlist
-   character (len=strlen), dimension(max_extra_inlists) :: extra_kap_inlist_name
-   
+   character (len = strlen), dimension(max_extra_inlists) :: extra_kap_inlist_name
+
    ! User supplied inputs
    real(dp) :: kap_ctrl(10)
    integer :: kap_integer_ctrl(10)
    logical :: kap_logical_ctrl(10)
-   character(len=strlen) :: kap_character_ctrl(10)
+   character(len = strlen) :: kap_character_ctrl(10)
 
    namelist /kap/ &
 
-      Zbase, & 
+      Zbase, &
 
       kap_file_prefix, kap_CO_prefix, kap_lowT_prefix, aesopus_filename, &
 
@@ -127,26 +126,26 @@
       use_other_compton_opacity, &
       use_other_radiative_opacity, &
 
-   ! User supplied inputs
+      ! User supplied inputs
       kap_ctrl, &
       kap_integer_ctrl, &
       kap_logical_ctrl, &
-      kap_character_ctrl,&
+      kap_character_ctrl, &
 
       read_extra_kap_inlist, extra_kap_inlist_name
 
-   contains
+contains
 
 
    ! read a "namelist" file and set parameters
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
-      character (len=*), intent(in) :: inlist
+      character (len = *), intent(in) :: inlist
       integer, intent(out) :: ierr ! 0 means AOK.
       type (Kap_General_Info), pointer :: rq
       integer :: iz, j
       include 'formats'
-      call get_kap_ptr(handle,rq,ierr)
+      call get_kap_ptr(handle, rq, ierr)
       if (ierr /= 0) return
       call set_default_controls
       call read_controls_file(rq, inlist, 1, ierr)
@@ -155,26 +154,26 @@
 
 
    recursive subroutine read_controls_file(rq, filename, level, ierr)
-      use ISO_FORTRAN_ENV, only: IOSTAT_END
+      use ISO_FORTRAN_ENV, only : IOSTAT_END
       character(*), intent(in) :: filename
       type (Kap_General_Info), pointer :: rq
       integer, intent(in) :: level
       integer, intent(out) :: ierr
       logical, dimension(max_extra_inlists) :: read_extra
-      character (len=strlen) :: message
-      character (len=strlen), dimension(max_extra_inlists) :: extra
+      character (len = strlen) :: message
+      character (len = strlen), dimension(max_extra_inlists) :: extra
       integer :: unit, i
 
       ierr = 0
       if (level >= 10) then
-         write(*,*) 'ERROR: too many levels of nested extra controls inlist files'
+         write(*, *) 'ERROR: too many levels of nested extra controls inlist files'
          ierr = -1
          return
       end if
 
       if (len_trim(filename) > 0) then
-         open(newunit=unit, file=trim(filename), &
-            action='read', delim='quote', status='old', iostat=ierr)
+         open(newunit = unit, file = trim(filename), &
+            action = 'read', delim = 'quote', status = 'old', iostat = ierr)
          if (ierr /= 0) then
             if (level == 1) then
                ierr = 0 ! no inlist file so just use defaults
@@ -184,7 +183,7 @@
             end if
             return
          end if
-         read(unit, nml=kap, iostat=ierr)
+         read(unit, nml = kap, iostat = ierr)
          close(unit)
          if (ierr == IOSTAT_END) then ! end-of-file means didn't find an &kap namelist
             ierr = 0
@@ -200,8 +199,8 @@
             write(*, '(a)') 'Failed while trying to read kap namelist file: ' // trim(filename)
             write(*, '(a)') 'Perhaps the following runtime error message will help you find the problem.'
             write(*, *)
-            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-            read(unit, nml=kap)
+            open(newunit = unit, file = trim(filename), action = 'read', delim = 'quote', status = 'old', iostat = ierr)
+            read(unit, nml = kap)
             close(unit)
             return
          end if
@@ -212,14 +211,14 @@
       if (len_trim(filename) == 0) return
 
       ! recursive calls to read other inlists
-      do i=1, max_extra_inlists
+      do i = 1, max_extra_inlists
          read_extra(i) = read_extra_kap_inlist(i)
          read_extra_kap_inlist(i) = .false.
          extra(i) = extra_kap_inlist_name(i)
          extra_kap_inlist_name(i) = 'undefined'
-   
+
          if (read_extra(i)) then
-            call read_controls_file(rq, extra(i), level+1, ierr)
+            call read_controls_file(rq, extra(i), level + 1, ierr)
             if (ierr /= 0) return
          end if
       end do
@@ -248,22 +247,22 @@
 
       ! check for limits on full_off/on options
       if (kap_Type2_full_off_X > 0.71d0) then
-         write(*,*) "kap_Type2_full_off_X must be smaller than 0.71"
+         write(*, *) "kap_Type2_full_off_X must be smaller than 0.71"
          ierr = -1
          return
       end if
       if (kap_Type2_full_on_X > 0.71d0) then
-         write(*,*) "kap_Type2_full_on_X must be smaller than 0.71"
+         write(*, *) "kap_Type2_full_on_X must be smaller than 0.71"
          ierr = -1
          return
       end if
       if (kap_Type2_full_off_X < kap_Type2_full_on_X) then
-         write(*,*) "kap_Type2_full_off_X has to be bigger than kap_Type2_full_on_X"
+         write(*, *) "kap_Type2_full_off_X has to be bigger than kap_Type2_full_on_X"
          ierr = -1
          return
       end if
       if (kap_Type2_full_off_dZ > kap_Type2_full_on_dZ) then
-         write(*,*) "kap_Type2_full_off_dZ has to be smaller than kap_Type2_full_on_dZ"
+         write(*, *) "kap_Type2_full_off_dZ has to be smaller than kap_Type2_full_on_dZ"
          ierr = -1
          return
       end if
@@ -273,34 +272,32 @@
       rq% kap_Type2_full_off_dZ = kap_Type2_full_off_dZ
       rq% kap_Type2_full_on_dZ = kap_Type2_full_on_dZ
 
-
       if (kap_blend_logT_upper_bdy > 0) rq% kap_blend_logT_upper_bdy = kap_blend_logT_upper_bdy
       if (kap_blend_logT_lower_bdy > 0) rq% kap_blend_logT_lower_bdy = kap_blend_logT_lower_bdy
 
-
       kap_option = 0
-      do i=1,kap_options_max
+      do i = 1, kap_options_max
          if (kap_file_prefix == kap_option_str(i)) then
             kap_option = i
             exit
          end if
       end do
       if (kap_option == 0) then
-         write(*,*) 'WARNING: unknown kap_file_prefix (assuming user table): ' // trim(kap_file_prefix)
+         write(*, *) 'WARNING: unknown kap_file_prefix (assuming user table): ' // trim(kap_file_prefix)
          kap_option = kap_user
          kap_option_str(kap_user) = trim(kap_file_prefix)
 
          if (user_num_kap_Xs == 0 .or. user_num_kap_Zs == 0) then
-            write(*,*) 'ERROR: must set user_num_kap_Xs, user_num_kap_Zs, and related variables'
+            write(*, *) 'ERROR: must set user_num_kap_Xs, user_num_kap_Zs, and related variables'
             ierr = -1
             return
          end if
 
          if (user_num_kap_Xs > kap_max_dim .or. user_num_kap_Zs > kap_max_dim) then
-            write(0,*) ' failed in kap_read_config_file: maximum X or Z dimensions exceeded'
-            write(0,*) ' maximum dimension is ', kap_max_dim
-            write(0,*) ' num_kap_Xs = ', num_kap_Xs
-            write(0,*) ' num_kap_Zs = ', num_kap_Zs
+            write(0, *) ' failed in kap_read_config_file: maximum X or Z dimensions exceeded'
+            write(0, *) ' maximum dimension is ', kap_max_dim
+            write(0, *) ' num_kap_Xs = ', num_kap_Xs
+            write(0, *) ' num_kap_Zs = ', num_kap_Zs
             ierr = -1
             return
          endif
@@ -316,21 +313,20 @@
       end if
       rq% kap_option = kap_option
 
-
       kap_CO_option = 0
-      do i=1,kap_CO_options_max
+      do i = 1, kap_CO_options_max
          if (kap_CO_prefix == kap_CO_option_str(i)) then
             kap_CO_option = i
             exit
          end if
       end do
       if (kap_CO_option == 0) then
-         write(*,*) 'WARNING: unknown kap_CO_prefix (assuming user table): ' // trim(kap_CO_prefix)
+         write(*, *) 'WARNING: unknown kap_CO_prefix (assuming user table): ' // trim(kap_CO_prefix)
          kap_CO_option = kap_CO_user
          kap_CO_option_str(kap_CO_user) = trim(kap_CO_prefix)
 
          if (user_num_kap_CO_Xs == 0 .or. user_num_kap_CO_Zs == 0) then
-            write(*,*) 'ERROR: must set user_num_kap_CO_Xs, user_num_kap_CO_Zs, and related variables'
+            write(*, *) 'ERROR: must set user_num_kap_CO_Xs, user_num_kap_CO_Zs, and related variables'
             ierr = -1
             return
          end if
@@ -346,30 +342,29 @@
       end if
       rq% kap_CO_option = kap_CO_option
 
-
       kap_lowT_option = 0
-      do i=1,kap_lowT_options_max
+      do i = 1, kap_lowT_options_max
          if (kap_lowT_prefix == kap_lowT_option_str(i)) then
             kap_lowT_option = i
             exit
          end if
       end do
       if (kap_lowT_option == 0) then
-         write(*,*) 'WARNING: unknown kap_lowT_prefix (assuming user table): ' // trim(kap_lowT_prefix)
+         write(*, *) 'WARNING: unknown kap_lowT_prefix (assuming user table): ' // trim(kap_lowT_prefix)
          kap_lowT_option = kap_lowT_user
          kap_lowT_option_str(kap_lowT_user) = trim(kap_lowT_prefix)
 
          if (user_num_kap_lowT_Xs == 0 .or. user_num_kap_lowT_Zs == 0) then
-            write(*,*) 'ERROR: must set user_num_kap_lowT_Xs, user_num_kap_lowT_Zs, and related variables'
+            write(*, *) 'ERROR: must set user_num_kap_lowT_Xs, user_num_kap_lowT_Zs, and related variables'
             ierr = -1
             return
          end if
 
          if (user_num_kap_lowT_Xs > kap_max_dim .or. user_num_kap_lowT_Zs > kap_max_dim) then
-            write(0,*) ' failed in kap_read_config_file: maximum X or Z dimensions exceeded'
-            write(0,*) ' maximum dimension is ', kap_max_dim
-            write(0,*) ' num_kap_lowT_Xs = ', num_kap_lowT_Xs
-            write(0,*) ' num_kap_lowT_Zs = ', num_kap_lowT_Zs
+            write(0, *) ' failed in kap_read_config_file: maximum X or Z dimensions exceeded'
+            write(0, *) ' maximum dimension is ', kap_max_dim
+            write(0, *) ' num_kap_lowT_Xs = ', num_kap_lowT_Xs
+            write(0, *) ' num_kap_lowT_Zs = ', num_kap_lowT_Zs
             ierr = -1
             return
          endif
@@ -406,19 +401,19 @@
       integer, intent(out) :: ierr
       type (Kap_General_Info), pointer :: rq
       integer :: iounit
-      open(newunit=iounit, file=trim(filename), &
-         action='write', status='replace', iostat=ierr)
+      open(newunit = iounit, file = trim(filename), &
+         action = 'write', status = 'replace', iostat = ierr)
       if (ierr /= 0) then
-         write(*,*) 'failed to open ' // trim(filename)
+         write(*, *) 'failed to open ' // trim(filename)
          return
       endif
-      call get_kap_ptr(handle,rq,ierr)
+      call get_kap_ptr(handle, rq, ierr)
       if (ierr /= 0) then
          close(iounit)
          return
       end if
       call set_controls_for_writing(rq)
-      write(iounit, nml=kap, iostat=ierr)
+      write(iounit, nml = kap, iostat = ierr)
       close(iounit)
    end subroutine write_namelist
 
@@ -457,21 +452,19 @@
       kap_logical_ctrl = rq% kap_logical_ctrl
       kap_character_ctrl = rq% kap_character_ctrl
 
-
    end subroutine set_controls_for_writing
 
 
-
    subroutine get_kap_controls(rq, name, val, ierr)
-      use utils_lib, only: StrUpCase
+      use utils_lib, only : StrUpCase
       type (kap_General_Info), pointer :: rq
-      character(len=*),intent(in) :: name
-      character(len=*), intent(out) :: val
+      character(len = *), intent(in) :: name
+      character(len = *), intent(out) :: val
       integer, intent(out) :: ierr
 
-      character(len(name)+1) :: upper_name
-      character(len=512) :: str
-      integer :: iounit,iostat,ind,i
+      character(len(name) + 1) :: upper_name
+      character(len = 512) :: str
+      integer :: iounit, iostat, ind, i
 
       ierr = 0
 
@@ -480,28 +473,28 @@
       call set_controls_for_writing(rq)
 
       ! Write namelist to temporay file
-      open(newunit=iounit,status='scratch')
-      write(iounit,nml=kap)
+      open(newunit = iounit, status = 'scratch')
+      write(iounit, nml = kap)
       rewind(iounit)
 
       ! Namelists get written in captials
-      upper_name = trim(StrUpCase(name))//'='
+      upper_name = trim(StrUpCase(name)) // '='
       val = ''
       ! Search for name inside namelist
-      do 
-         read(iounit,'(A)',iostat=iostat) str
-         ind = index(trim(str),trim(upper_name))
-         if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
-            do i=1,len(val)
+      do
+         read(iounit, '(A)', iostat = iostat) str
+         ind = index(trim(str), trim(upper_name))
+         if(ind /= 0) then
+            val = str(ind + len_trim(upper_name):len_trim(str) - 1) ! Remove final comma and starting =
+            do i = 1, len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
-      if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+      if(len_trim(val) == 0 .and. ind==0) ierr = -1
 
       close(iounit)
 
@@ -509,8 +502,8 @@
 
    subroutine set_kap_controls(rq, name, val, ierr)
       type (kap_General_Info), pointer :: rq
-      character(len=*), intent(in) :: name, val
-      character(len=len(name)+len(val)+8) :: tmp
+      character(len = *), intent(in) :: name, val
+      character(len = len(name) + len(val) + 8) :: tmp
       integer, intent(out) :: ierr
 
       ierr = 0
@@ -518,18 +511,17 @@
       ! First save current kap_controls
       call set_controls_for_writing(rq)
 
-      tmp=''
-      tmp = '&kap '//trim(name)//'='//trim(val)//' /'
+      tmp = ''
+      tmp = '&kap ' // trim(name) // '=' // trim(val) // ' /'
 
       ! Load into namelist
-      read(tmp, nml=kap)
+      read(tmp, nml = kap)
 
       ! Add to kap
-      call store_controls(rq,ierr)
+      call store_controls(rq, ierr)
       if(ierr/=0) return
 
    end subroutine set_kap_controls
 
 
-
-   end module kap_ctrls_io
+end module kap_ctrls_io

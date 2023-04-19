@@ -25,379 +25,379 @@
 
 module overshoot_utils
 
-  ! Uses
+   ! Uses
 
-  use num_lib
-  use star_private_def
+   use num_lib
+   use star_private_def
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
-  
-  public :: eval_conv_bdy_k
-  public :: eval_conv_bdy_r
-  public :: eval_conv_bdy_Hp
-  public :: eval_over_bdy_params
+   private
 
-  ! Procedures
+   public :: eval_conv_bdy_k
+   public :: eval_conv_bdy_r
+   public :: eval_conv_bdy_Hp
+   public :: eval_over_bdy_params
+
+   ! Procedures
 
 contains
 
-  subroutine eval_conv_bdy_k (s, i, k, ierr)
+   subroutine eval_conv_bdy_k (s, i, k, ierr)
 
-    type(star_info), pointer :: s
-    integer, intent(in)      :: i
-    integer, intent(out)     :: k
-    integer, intent(out)     :: ierr
+      type(star_info), pointer :: s
+      integer, intent(in) :: i
+      integer, intent(out) :: k
+      integer, intent(out) :: ierr
 
-    ! Evaluate the index k of the cell containing the i'th convective
-    ! boundary
+      ! Evaluate the index k of the cell containing the i'th convective
+      ! boundary
 
-    ierr = 0
-    
-    if (s%top_conv_bdy(i)) then
-       k = s%conv_bdy_loc(i)
-    else
-       k = s%conv_bdy_loc(i) - 1
-    endif
+      ierr = 0
 
-    if (k >= s%nz .OR. k < 1) then
-       write(*,*) 'Invalid cell for convective boundary: i, k, nz=', i, k, s%nz
-       ierr = -1
-       return
-    endif
+      if (s%top_conv_bdy(i)) then
+         k = s%conv_bdy_loc(i)
+      else
+         k = s%conv_bdy_loc(i) - 1
+      endif
 
-    ! Finish
+      if (k >= s%nz .OR. k < 1) then
+         write(*, *) 'Invalid cell for convective boundary: i, k, nz=', i, k, s%nz
+         ierr = -1
+         return
+      endif
 
-    return
+      ! Finish
 
-  end subroutine eval_conv_bdy_k
+      return
 
-  !****
+   end subroutine eval_conv_bdy_k
 
-  subroutine eval_conv_bdy_r (s, i, r, ierr)
+   !****
 
-    type(star_info), pointer :: s
-    integer, intent(in)      :: i
-    real(dp), intent(out)    :: r
-    integer, intent(out)     :: ierr
+   subroutine eval_conv_bdy_r (s, i, r, ierr)
 
-    integer  :: k
-    real(dp) :: w
+      type(star_info), pointer :: s
+      integer, intent(in) :: i
+      real(dp), intent(out) :: r
+      integer, intent(out) :: ierr
 
-    ! Evaluate the radius r at the i'th convective boundary
+      integer :: k
+      real(dp) :: w
 
-    ! Find the convective boundary cell
+      ! Evaluate the radius r at the i'th convective boundary
 
-    ierr = 0
+      ! Find the convective boundary cell
 
-    call eval_conv_bdy_k(s, i, k, ierr)
-    if (ierr /= 0) return
+      ierr = 0
 
-    ! Interpolate r based on the fact that r^3 varies linearly with q
-    ! across the (constant-density) cell
-
-    w = s%cz_bdy_dq(k)/s%dq(k)
-
-    if (w < 0._dp .OR. w > 1._dp) then
-       write(*,*) 'Invalid weight for convective boundary: i, w=', i, w
-       ierr = -1
-       return
-    end if
-
-    associate (k_o => k, &
-               k_i => k+1)
-
-      r = pow((      w)*s%r(k_i)*s%r(k_i)*s%r(k_i) + &
-                 (1._dp-w)*s%r(k_o)*s%r(k_o)*s%r(k_o), 1._dp/3._dp)
-
-    end associate
-
-    ! Finish
-
-    return
-
-  end subroutine eval_conv_bdy_r
-
-  !****
-
-  subroutine eval_conv_bdy_Hp (s, i, Hp, ierr)
-
-    type(star_info), pointer :: s
-    integer, intent(in)      :: i
-    real(dp), intent(out)    :: Hp
-    integer, intent(out)     :: ierr
-
-    integer  :: k
-    real(dp) :: r
-    real(dp) :: w
-    real(dp) :: x0
-    real(dp) :: x1
-    real(dp) :: x2
-    real(dp) :: x
-    real(dp) :: a0
-    real(dp) :: a1
-    real(dp) :: a2
-    real(dp) :: P
-    real(dp) :: rho
-    real(dp) :: r_top
-    real(dp) :: r_bot
-    real(dp) :: dr
-
-    ! Evaluate the pressure scale height Hp at the i'th convective boundary
-
-    ! Find the convective boundary cell
-
-    ierr = 0
-
-    call eval_conv_bdy_k(s, i, k, ierr)
-    if (ierr /= 0) return
-
-    ! Evaluate the radius at the convective boundary
-
-    call eval_conv_bdy_r(s, i, r, ierr)
-    if (ierr /= 0) return
-
-    ! Interpolate the pressure and density at the boundary, using a
-    ! quadratic fit across the boundary cell and its neighbors (the
-    ! x's are fractional mass distances from the outer edge of cell
-    ! k-1); then, evaluate the pressure scale height
-
-    associate (k_o => k-1, &
-               k_m => k, &
-               k_i => k+1)
-
-      x0 = s%dq(k_o)/2._dp
-      x1 = s%dq(k_o) + s%dq(k_m)/2._dp
-      x2 = s%dq(k_o) + s%dq(k_m) + s%dq(k_i)/2._dp
-
-      x = s%dq(k_o) + s%cz_bdy_dq(k)
-
-      call two_piece_linear_coeffs(x, x0, x1, x2, a0, a1, a2, ierr)
+      call eval_conv_bdy_k(s, i, k, ierr)
       if (ierr /= 0) return
 
-      P = exp(a0*s%lnPeos(k_o) + a1*s%lnPeos(k_m) + a2*s%lnPeos(k_i))
-      rho = exp(a0*s%lnd(k_o) + a1*s%lnd(k_m) + a2*s%lnd(k_i))
+      ! Interpolate r based on the fact that r^3 varies linearly with q
+      ! across the (constant-density) cell
 
-      ! Evaluate the pressure scale height
+      w = s%cz_bdy_dq(k) / s%dq(k)
 
-      Hp = P/(rho*s%cgrav(k_m)* &
-           (s%M_center + s%xmstar*s%conv_bdy_q(i))/(r*r))
+      if (w < 0._dp .OR. w > 1._dp) then
+         write(*, *) 'Invalid weight for convective boundary: i, w=', i, w
+         ierr = -1
+         return
+      end if
 
-    end associate
+      associate (k_o => k, &
+         k_i => k + 1)
 
-    ! (Possibly) limit the scale height using the size of the
-    ! convection zone
+         r = pow((w) * s%r(k_i) * s%r(k_i) * s%r(k_i) + &
+            (1._dp - w) * s%r(k_o) * s%r(k_o) * s%r(k_o), 1._dp / 3._dp)
 
-    if (s%limit_overshoot_Hp_using_size_of_convection_zone) then
+      end associate
 
-       ! Determine the radial extent of the convection zone (note that
-       ! r_top/r_bot don't coincide exactly with the r calculated
-       ! above)
+      ! Finish
 
-       if (s%top_conv_bdy(i)) then
+      return
 
-          if (i == 1) then
-             r_bot = s%R_center
-          else
-             if (s%top_conv_bdy(i-1)) then
-                write(*,*) 'Double top boundary in overshoot; i=', i
-                ierr = -1
-                return
-             end if
-             r_bot = s%r(s%conv_bdy_loc(i-1))
-          endif
+   end subroutine eval_conv_bdy_r
 
-          r_top = s%r(k)
+   !****
 
-       else
+   subroutine eval_conv_bdy_Hp (s, i, Hp, ierr)
 
-          r_bot = s%r(k+1)
+      type(star_info), pointer :: s
+      integer, intent(in) :: i
+      real(dp), intent(out) :: Hp
+      integer, intent(out) :: ierr
 
-          if (i == s%num_conv_boundaries) then
-             r_top = s%r(1)
-          else
-             if (.NOT. s%top_conv_bdy(i+1)) then
-                write(*,*) 'Double bottom boundary in overshoot; i=', i
-                ierr = -1
-                return
-             endif
-             r_top = s%r(s%conv_bdy_loc(i+1))
-          endif
+      integer :: k
+      real(dp) :: r
+      real(dp) :: w
+      real(dp) :: x0
+      real(dp) :: x1
+      real(dp) :: x2
+      real(dp) :: x
+      real(dp) :: a0
+      real(dp) :: a1
+      real(dp) :: a2
+      real(dp) :: P
+      real(dp) :: rho
+      real(dp) :: r_top
+      real(dp) :: r_bot
+      real(dp) :: dr
 
-       endif
-          
-       dr = r_top - r_bot
+      ! Evaluate the pressure scale height Hp at the i'th convective boundary
 
-       ! Apply the limit
+      ! Find the convective boundary cell
 
-       if (s%overshoot_alpha > 0d0) then
-          if (s%overshoot_alpha*Hp > dr) Hp = dr/s%overshoot_alpha
-       else
-          if (s%alpha_mlt(k)*Hp > dr) Hp = dr/s%mixing_length_alpha
-       end if
+      ierr = 0
 
-    end if
+      call eval_conv_bdy_k(s, i, k, ierr)
+      if (ierr /= 0) return
 
-    ! Finish
+      ! Evaluate the radius at the convective boundary
 
-    return
+      call eval_conv_bdy_r(s, i, r, ierr)
+      if (ierr /= 0) return
 
-  end subroutine eval_conv_bdy_Hp
+      ! Interpolate the pressure and density at the boundary, using a
+      ! quadratic fit across the boundary cell and its neighbors (the
+      ! x's are fractional mass distances from the outer edge of cell
+      ! k-1); then, evaluate the pressure scale height
 
-  !****
+      associate (k_o => k - 1, &
+         k_m => k, &
+         k_i => k + 1)
 
-  subroutine eval_over_bdy_params (s, i, f0, k, r, D, vc, ierr)
+         x0 = s%dq(k_o) / 2._dp
+         x1 = s%dq(k_o) + s%dq(k_m) / 2._dp
+         x2 = s%dq(k_o) + s%dq(k_m) + s%dq(k_i) / 2._dp
 
-    type(star_info), pointer :: s
-    integer, intent(in)      :: i
-    real(dp), intent(in)     :: f0
-    integer, intent(out)     :: k
-    real(dp), intent(out)    :: r
-    real(dp), intent(out)    :: D
-    real(dp), intent(out)    :: vc
-    integer, intent(out)     :: ierr
+         x = s%dq(k_o) + s%cz_bdy_dq(k)
 
-    integer  :: k_cb
-    real(dp) :: r_cb
-    real(dp) :: Hp_cb
-    real(dp) :: w
-    real(dp) :: lambda
+         call two_piece_linear_coeffs(x, x0, x1, x2, a0, a1, a2, ierr)
+         if (ierr /= 0) return
 
-    ! Evaluate parameters (cell index k, radius r, diffusion
-    ! coefficients D and cdc) for the overshoot boundary associated
-    ! with the i'th convective boundary
+         P = exp(a0 * s%lnPeos(k_o) + a1 * s%lnPeos(k_m) + a2 * s%lnPeos(k_i))
+         rho = exp(a0 * s%lnd(k_o) + a1 * s%lnd(k_m) + a2 * s%lnd(k_i))
 
-    ! Find the convective boundary cell
+         ! Evaluate the pressure scale height
 
-    ierr = 0
+         Hp = P / (rho * s%cgrav(k_m) * &
+            (s%M_center + s%xmstar * s%conv_bdy_q(i)) / (r * r))
 
-    call eval_conv_bdy_k(s, i, k_cb, ierr)
-    if (ierr /= 0) return
+      end associate
 
-    ! Evaluate the radius at the convective boundary
+      ! (Possibly) limit the scale height using the size of the
+      ! convection zone
 
-    call eval_conv_bdy_r(s, i, r_cb, ierr)
-    if (ierr /= 0) return
+      if (s%limit_overshoot_Hp_using_size_of_convection_zone) then
 
-    ! Evaluate the pressure scale height at the convective boundary
+         ! Determine the radial extent of the convection zone (note that
+         ! r_top/r_bot don't coincide exactly with the r calculated
+         ! above)
 
-    call eval_conv_bdy_Hp(s, i, Hp_cb, ierr)
-    if (ierr /= 0) return
+         if (s%top_conv_bdy(i)) then
 
-    ! Search for the overshoot boundary cell
+            if (i == 1) then
+               r_bot = s%R_center
+            else
+               if (s%top_conv_bdy(i - 1)) then
+                  write(*, *) 'Double top boundary in overshoot; i=', i
+                  ierr = -1
+                  return
+               end if
+               r_bot = s%r(s%conv_bdy_loc(i - 1))
+            endif
 
-    ierr = 0
+            r_top = s%r(k)
 
-    if (s%top_conv_bdy(i)) then
+         else
 
-       ! Overshooting outward -- search inward
+            r_bot = s%r(k + 1)
 
-       r = r_cb - f0*Hp_cb
+            if (i == s%num_conv_boundaries) then
+               r_top = s%r(1)
+            else
+               if (.NOT. s%top_conv_bdy(i + 1)) then
+                  write(*, *) 'Double bottom boundary in overshoot; i=', i
+                  ierr = -1
+                  return
+               endif
+               r_top = s%r(s%conv_bdy_loc(i + 1))
+            endif
 
-       if (r <= s%r(s%nz)) then
+         endif
 
-          r = s%r(s%nz)
-          k = s%nz - 1
+         dr = r_top - r_bot
 
-       else
+         ! Apply the limit
 
-          search_in_loop: do k = k_cb, s%nz-1
-             if (s%r(k+1) <= r) exit search_in_loop
-          end do search_in_loop
+         if (s%overshoot_alpha > 0d0) then
+            if (s%overshoot_alpha * Hp > dr) Hp = dr / s%overshoot_alpha
+         else
+            if (s%alpha_mlt(k) * Hp > dr) Hp = dr / s%mixing_length_alpha
+         end if
 
-       endif
+      end if
 
-    else
+      ! Finish
 
-       ! Overshooting inward -- search outward
+      return
 
-       r = r_cb + f0*Hp_cb
+   end subroutine eval_conv_bdy_Hp
 
-       if (r >=  s%r(1)) then
+   !****
 
-          r = s%r(1)
-          k = 1
+   subroutine eval_over_bdy_params (s, i, f0, k, r, D, vc, ierr)
 
-       else
+      type(star_info), pointer :: s
+      integer, intent(in) :: i
+      real(dp), intent(in) :: f0
+      integer, intent(out) :: k
+      real(dp), intent(out) :: r
+      real(dp), intent(out) :: D
+      real(dp), intent(out) :: vc
+      integer, intent(out) :: ierr
 
-          search_out_loop : do k = k_cb, 1, -1
-             if (s%r(k) > r) exit search_out_loop
-          end do search_out_loop
+      integer :: k_cb
+      real(dp) :: r_cb
+      real(dp) :: Hp_cb
+      real(dp) :: w
+      real(dp) :: lambda
 
-       endif
+      ! Evaluate parameters (cell index k, radius r, diffusion
+      ! coefficients D and cdc) for the overshoot boundary associated
+      ! with the i'th convective boundary
 
-    endif
+      ! Find the convective boundary cell
 
-    if (.NOT. (s%r(k+1) <= r .AND. s%r(k) >= r)) then
-       write(*,*) 'r_ob not correctly bracketed: r(k+1), r, r(k)=', s%r(k+1), r, s%r(k)
-       ierr = -1
-       return
-    end if
+      ierr = 0
 
-    ! Interpolate mixing parameters
- 
-    w = (s%r(k)*s%r(k)*s%r(k) - r*r*r)/ &
-        (s%r(k)*s%r(k)*s%r(k) - s%r(k+1)*s%r(k+1)*s%r(k+1))
+      call eval_conv_bdy_k(s, i, k_cb, ierr)
+      if (ierr /= 0) return
 
-    lambda = (1._dp-w)*s%mlt_mixing_length(k) + w*s%mlt_mixing_length(k+1)
+      ! Evaluate the radius at the convective boundary
 
-    if (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k+1) /= 0._dp) then
+      call eval_conv_bdy_r(s, i, r_cb, ierr)
+      if (ierr /= 0) return
 
-       ! Both faces of cell have non-zero mixing; interpolate vc between faces
+      ! Evaluate the pressure scale height at the convective boundary
 
-       vc = (1._dp-w)*s%conv_vel(k) + w*s%conv_vel(k+1)
+      call eval_conv_bdy_Hp(s, i, Hp_cb, ierr)
+      if (ierr /= 0) return
 
-    elseif (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k+1) == 0._dp) then
+      ! Search for the overshoot boundary cell
 
-       ! Outer face of cell has non-zero mixing; interpolate vc
-       ! between this face and r_cb, assuming vc = 0 at the latter
+      ierr = 0
 
-        if(s%r(k) /= r_cb) then
-          w = (s%r(k)*s%r(k)*s%r(k) - r*r*r)/ &
-           (s%r(k)*s%r(k)*s%r(k) - r_cb*r_cb*r_cb)
-        else
-          w = 0d0
-        end if
+      if (s%top_conv_bdy(i)) then
 
-       vc = (1._dp-w)*s%conv_vel(k)
+         ! Overshooting outward -- search inward
 
-    elseif (s%conv_vel(k) == 0._dp .AND. s%conv_vel(k+1) /= 0._dp) then
+         r = r_cb - f0 * Hp_cb
 
-       ! Inner face of cell has non-zero mixing; interpolate vc
-       ! between this face and r_cb, assuming vc = 0 at the latter
+         if (r <= s%r(s%nz)) then
 
-       if(s%r(k+1) /= r_cb) then
-          w = (r_cb*r_cb*r_cb - r*r*r)/ &
-           (r_cb*r_cb*r_cb - s%r(k+1)*s%r(k+1)*s%r(k+1))
-       else
-          w = 0d0
-       end if
+            r = s%r(s%nz)
+            k = s%nz - 1
 
-       vc = w*s%conv_vel(k+1)
+         else
 
-    else
+            search_in_loop : do k = k_cb, s%nz - 1
+               if (s%r(k + 1) <= r) exit search_in_loop
+            end do search_in_loop
 
-       ! Neither face of cell has non-zero mixing; return
+         endif
 
-       vc = 0._dp
+      else
 
-    endif
+         ! Overshooting inward -- search outward
 
-    ! Evaluate the diffusion coefficient
+         r = r_cb + f0 * Hp_cb
 
-    D = vc*lambda/3._dp
+         if (r >=  s%r(1)) then
 
-    ! Finish
+            r = s%r(1)
+            k = 1
 
-    ierr = 0
+         else
 
-    return
+            search_out_loop : do k = k_cb, 1, -1
+               if (s%r(k) > r) exit search_out_loop
+            end do search_out_loop
 
-  end subroutine eval_over_bdy_params
+         endif
+
+      endif
+
+      if (.NOT. (s%r(k + 1) <= r .AND. s%r(k) >= r)) then
+         write(*, *) 'r_ob not correctly bracketed: r(k+1), r, r(k)=', s%r(k + 1), r, s%r(k)
+         ierr = -1
+         return
+      end if
+
+      ! Interpolate mixing parameters
+
+      w = (s%r(k) * s%r(k) * s%r(k) - r * r * r) / &
+         (s%r(k) * s%r(k) * s%r(k) - s%r(k + 1) * s%r(k + 1) * s%r(k + 1))
+
+      lambda = (1._dp - w) * s%mlt_mixing_length(k) + w * s%mlt_mixing_length(k + 1)
+
+      if (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k + 1) /= 0._dp) then
+
+         ! Both faces of cell have non-zero mixing; interpolate vc between faces
+
+         vc = (1._dp - w) * s%conv_vel(k) + w * s%conv_vel(k + 1)
+
+      elseif (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k + 1) == 0._dp) then
+
+         ! Outer face of cell has non-zero mixing; interpolate vc
+         ! between this face and r_cb, assuming vc = 0 at the latter
+
+         if(s%r(k) /= r_cb) then
+            w = (s%r(k) * s%r(k) * s%r(k) - r * r * r) / &
+               (s%r(k) * s%r(k) * s%r(k) - r_cb * r_cb * r_cb)
+         else
+            w = 0d0
+         end if
+
+         vc = (1._dp - w) * s%conv_vel(k)
+
+      elseif (s%conv_vel(k) == 0._dp .AND. s%conv_vel(k + 1) /= 0._dp) then
+
+         ! Inner face of cell has non-zero mixing; interpolate vc
+         ! between this face and r_cb, assuming vc = 0 at the latter
+
+         if(s%r(k + 1) /= r_cb) then
+            w = (r_cb * r_cb * r_cb - r * r * r) / &
+               (r_cb * r_cb * r_cb - s%r(k + 1) * s%r(k + 1) * s%r(k + 1))
+         else
+            w = 0d0
+         end if
+
+         vc = w * s%conv_vel(k + 1)
+
+      else
+
+         ! Neither face of cell has non-zero mixing; return
+
+         vc = 0._dp
+
+      endif
+
+      ! Evaluate the diffusion coefficient
+
+      D = vc * lambda / 3._dp
+
+      ! Finish
+
+      ierr = 0
+
+      return
+
+   end subroutine eval_over_bdy_params
 
 end module overshoot_utils

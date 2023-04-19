@@ -26,17 +26,17 @@
 
 module tdc
 
-use const_def
-use num_lib
-use utils_lib
-use auto_diff
-use star_data_def
-use tdc_support
+   use const_def
+   use num_lib
+   use utils_lib
+   use auto_diff
+   use star_data_def
+   use tdc_support
 
-implicit none
+   implicit none
 
-private
-public :: get_TDC_solution
+   private
+   public :: get_TDC_solution
 
 contains
 
@@ -59,9 +59,9 @@ contains
       type(tdc_info), intent(in) :: info
       real(dp), intent(in) :: scale
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
-      type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
+      type(auto_diff_real_star_order1), intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
-      
+
       logical :: Y_is_positive
       type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
       type(auto_diff_real_tdc) :: Q, Q0
@@ -71,8 +71,8 @@ contains
 
       ierr = 0
       if (info%mixing_length_alpha == 0d0 .or. info%dt <= 0d0) then
-         call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
-      end if         
+         call mesa_error(__FILE__, __LINE__, 'bad call to TDC get_TDC_solution')
+      end if
 
       ! Determine the sign of the solution.
       !
@@ -90,14 +90,14 @@ contains
       end if
 
       if (info%report) then
-         open(unit=4,file='out.data')
-         do iter=1,1000
-            Z0 = (Zlb + (Zub-Zlb)*(iter-1)/1000)
-            Y = set_Y(Y_is_positive,Z0)
+         open(unit = 4, file = 'out.data')
+         do iter = 1, 1000
+            Z0 = (Zlb + (Zub - Zlb) * (iter - 1) / 1000)
+            Y = set_Y(Y_is_positive, Z0)
             call compute_Q(info, Y, Q, Af)
-            write(4,*) Y%val, Q%val
+            write(4, *) Y%val, Q%val
          end do
-         write(*,*) 'Wrote Q(Y) to out.data'
+         write(*, *) 'Wrote Q(Y) to out.data'
       end if
 
       ! Start down the chain of logic...
@@ -106,9 +106,9 @@ contains
          call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
          Y = convert(Y_face)
          if (ierr /= 0) return
-         if (info%report) write(*,*) 'Y is positive, Y=',Y_face%val
+         if (info%report) write(*, *) 'Y is positive, Y=', Y_face%val
       else
-         if (info%report) write(*,*) 'Y is negative.'
+         if (info%report) write(*, *) 'Y is negative.'
          ! If Y < 0 then Q(Y) is not guaranteed to be monotone, so we have to be more careful.
          ! One root we could have is the radiative solution (with Af==0), given by
          radY = (info%L - info%L0 * info%gradL) / info%L0
@@ -119,9 +119,9 @@ contains
          ! A0 reaches zero could be at Z < lower_bound_Z).
          if (info%A0 < 1d-10) then
             Y = radY
-            if (info%report) write(*,*) 'A0 == 0, Y=',Y%val
+            if (info%report) write(*, *) 'A0 == 0, Y=', Y%val
          else
-            if (info%report) write(*,*) 'A0 > 0.'
+            if (info%report) write(*, *) 'A0 > 0.'
             ! Otherwise, we keep going.
 
             ! We divide the possible functions Af(Z) into three classes:
@@ -143,7 +143,7 @@ contains
             if (Af == 0) then
                ! Means we're in case 1. Return the radiative Y.
                Y = radY
-               if (info%report) write(*,*) 'Case 1: Af(Zlb) == 0, Y=radY=',Y%val
+               if (info%report) write(*, *) 'Case 1: Af(Zlb) == 0, Y=radY=', Y%val
             else
                Y0 = set_Y(.false., Zub)
                call compute_Q(info, Y0, Q, Af)
@@ -151,7 +151,7 @@ contains
                   ! Means we're in case 2. Af > 0 on the whole interval, so dQ/dZ is continuous on the whole interval,
                   ! so return Z0 = Zub.
                   Z0 = Zub
-                  if (info%report) write(*,*) 'Case 1: Af(Zub) > 0, Z0=',Z0%val
+                  if (info%report) write(*, *) 'Case 1: Af(Zub) > 0, Z0=', Z0%val
                else
                   ! Means we're in case 3.
 
@@ -166,10 +166,10 @@ contains
                   ! ierr /= 0 should be impossible, because we checked the necessary conditions
                   ! for the bisection search above. Nonetheless, bugs can crop up, so we leave this
                   ! check in here and leave the checks in Af_bisection_search.
-                  if (ierr /= 0) return 
+                  if (ierr /= 0) return
                   Y0 = set_Y(.false., Z0)
                   call compute_Q(info, Y0, Q, Af)
-                  if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
+                  if (info%report) write(*, *) 'Bisected Af. Y0=', Y0%val, 'Af(Y0)=', Af%val
                end if
 
                ! If we're still here it means we were in either case 2 or case 3.
@@ -178,36 +178,36 @@ contains
                call dQdZ_bisection_search(info, Zlb, Z0, Z1, has_root)
                if (has_root) then
                   Y1 = set_Y(.false., Z1)
-                  if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
+                  if (info%report) write(*, *) 'Bisected dQdZ, found root, ', Y1%val
                   call compute_Q(info, Y1, Q, Af)
                   if (Q < 0) then ! Means there are no roots with Af > 0.
-                     if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
+                     if (info%report) write(*, *) 'Root has Q<0, Q=', Q%val, 'Y=', radY%val
                      Y = radY
                   else
-                     if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
+                     if (info%report) write(*, *) 'Root has Q>0. Q(Y1)=', Q%val
                      ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
-                     if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
+                     if (info%report) write(*, *) 'Searching from Y=', -exp(Zlb%val), 'to Y=', -exp(Z1%val)
                      call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
                      Y = convert(Y_face)
-                     if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
+                     if (info%report) write(*, *) 'ierr', ierr, tdc_num_iters
                      if (ierr /= 0) then
-                        if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
+                        if (info%report) write(*, *) 'No root found. Searching from Y=', -exp(Z1%val), 'to Y=', -exp(Z0%val)
                         ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
                         ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
                         call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
                         Y = convert(Y_face)
                      end if
-                     if (info%report) write(*,*) 'Y=',Y%val
+                     if (info%report) write(*, *) 'Y=', Y%val
                   end if
                else
-                  if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
+                  if (info%report) write(*, *) 'Bisected dQdZ, no root found.'
                   call compute_Q(info, Y0, Q, Af)
                   if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
                      call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
                      Y = convert(Y_face)
-                     if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
+                     if (info%report) write(*, *) 'Q(Y0) > 0, bisected and found Y=', Y%val
                   else ! Means there's no root in [Y0,0] so the only root is radY.
-                     if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
+                     if (info%report) write(*, *) 'Q(Y0) < 0, Y=', radY%val
                      Y = radY
                   end if
                end if
@@ -219,7 +219,7 @@ contains
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
       Y_face = unconvert(Y)
-      conv_vel = sqrt_2_div_3*unconvert(Af)   
+      conv_vel = sqrt_2_div_3 * unconvert(Af)
 
    end subroutine get_TDC_solution
 
@@ -240,11 +240,11 @@ contains
       logical, intent(in) :: Y_is_positive
       real(dp), intent(in) :: scale
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
-      type(auto_diff_real_star_order1),intent(out) :: Y_face
+      type(auto_diff_real_star_order1), intent(out) :: Y_face
       type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
-      
+
       type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ, Q0
       integer :: iter, line_iter
@@ -267,8 +267,8 @@ contains
 
       ! Set up Z from bisection search
       Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
-      if (info%report) write(*,*) 'Z from bisection search', Z%val
-      if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
+      if (info%report) write(*, *) 'Z from bisection search', Z%val
+      if (info%report) write(*, *) 'lower_bound_Z, upper_bound_Z', lower_bound_Z%val, upper_bound_Z%val
 
       ! Now we refine the solution with a Newton solve.
       ! This also let's us pick up the derivative of the solution with respect to input parameters.
@@ -277,15 +277,15 @@ contains
       dQdz = 0d0
       converged = .false.
       have_derivatives = .false. ! Tracks if we've done at least one Newton iteration.
-                                 ! Need to do this before returning to endow Y with partials
-                                 ! with respect to the structure variables.
+      ! Need to do this before returning to endow Y with partials
+      ! with respect to the structure variables.
       do iter = 1, max_iter
          Y = set_Y(Y_is_positive, Z)
          call compute_Q(info, Y, Q, Af)
 
-         if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
+         if (abs(Q%val) / scale <= residual_tolerance .and. have_derivatives) then
             ! Can't exit on the first iteration, otherwise we have no derivative information.
-            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+            if (info%report) write(*, 2) 'converged', iter, abs(Q%val) / scale, residual_tolerance
             converged = .true.
             exit
          end if
@@ -307,11 +307,11 @@ contains
             exit
          end if
 
-         correction = -Q/dQdz
+         correction = -Q / dQdz
          corr_has_derivatives = .true.
 
          ! Do a line search to avoid steps that are too big.
-         do line_iter=1,max_line_search_iter
+         do line_iter = 1, max_line_search_iter
 
             if (abs(correction) < correction_tolerance .and. have_derivatives) then
                ! Can't get much more precision than this.
@@ -333,7 +333,7 @@ contains
                Z_new = (Z + lower_bound_Z) / 2d0
             end if
 
-            Y = set_Y(Y_is_positive,Z_new)
+            Y = set_Y(Y_is_positive, Z_new)
 
             call compute_Q(info, Y, Qc, Af)
 
@@ -344,12 +344,12 @@ contains
             end if
          end do
 
-         if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
+         if (info%report) write(*, 3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
             Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
          Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
          Z = Z_new
 
-         Y = set_Y(Y_is_positive,Z)
+         Y = set_Y(Y_is_positive, Z)
          if (converged) exit
 
       end do
@@ -357,33 +357,33 @@ contains
       if (.not. converged) then
          ierr = 1
          if (info%report) then
-         !$OMP critical (tdc_crit0)
-            write(*,*) 'failed get_TDC_solution TDC_iter', &
+            !$OMP critical (tdc_crit0)
+            write(*, *) 'failed get_TDC_solution TDC_iter', &
                iter
-            write(*,*) 'scale', scale
-            write(*,*) 'Q/scale', Q%val/scale
-            write(*,*) 'tolerance', residual_tolerance
-            write(*,*) 'dQdZ', dQdZ%val
-            write(*,*) 'Y', Y%val
-            write(*,*) 'dYdZ', Y%d1val1
-            write(*,*) 'exp(Z)', exp(Z%val)
-            write(*,*) 'Z', Z%val
-            write(*,*) 'Af', Af%val
-            write(*,*) 'A0', info%A0%val
-            write(*,*) 'c0', info%c0%val
-            write(*,*) 'L', info%L%val
-            write(*,*) 'L0', info%L0%val
-            write(*,*) 'grada', info%grada%val
-            write(*,*) 'gradL', info%gradL%val
-            write(*,'(A)')
-         !$OMP end critical (tdc_crit0)
+            write(*, *) 'scale', scale
+            write(*, *) 'Q/scale', Q%val / scale
+            write(*, *) 'tolerance', residual_tolerance
+            write(*, *) 'dQdZ', dQdZ%val
+            write(*, *) 'Y', Y%val
+            write(*, *) 'dYdZ', Y%d1val1
+            write(*, *) 'exp(Z)', exp(Z%val)
+            write(*, *) 'Z', Z%val
+            write(*, *) 'Af', Af%val
+            write(*, *) 'A0', info%A0%val
+            write(*, *) 'c0', info%c0%val
+            write(*, *) 'L', info%L%val
+            write(*, *) 'L0', info%L0%val
+            write(*, *) 'grada', info%grada%val
+            write(*, *) 'gradL', info%gradL%val
+            write(*, '(A)')
+            !$OMP end critical (tdc_crit0)
          end if
          return
       end if
 
       ! Unpack output
       Y_face = unconvert(Y)
-      tdc_num_iters = iter          
+      tdc_num_iters = iter
    end subroutine bracket_plus_Newton_search
 
 end module tdc

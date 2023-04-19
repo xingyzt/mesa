@@ -41,44 +41,44 @@
 
 module cinter_m
 
-  ! Uses
+   ! Uses
 
-  use kinds_m
+   use kinds_m
 
-  use ISO_FORTRAN_ENV
-  use ISO_C_BINDING
-  
-  ! No implicit typing
+   use ISO_FORTRAN_ENV
+   use ISO_C_BINDING
 
-  implicit none
+   ! No implicit typing
 
-  ! Interfaces
+   implicit none
 
-  interface c_f_len
-     module procedure c_f_len_arr_
-     module procedure c_f_len_ptr_
-  end interface c_f_len
+   ! Interfaces
 
-  interface c_f_string
-     module procedure c_f_string_arr_
-     module procedure c_f_string_ptr_
-  end interface c_f_string
+   interface c_f_len
+      module procedure c_f_len_arr_
+      module procedure c_f_len_ptr_
+   end interface c_f_len
 
-  ! Access specifiers
+   interface c_f_string
+      module procedure c_f_string_arr_
+      module procedure c_f_string_ptr_
+   end interface c_f_string
 
-  private
+   ! Access specifiers
 
-  public :: c_f_len
-  public :: c_f_string
+   private
 
-  ! Procedures
+   public :: c_f_len
+   public :: c_f_string
+
+   ! Procedures
 
 contains
 
    function c_f_len_arr_(c_str) result (f_len)
 
       character(C_CHAR) :: c_str(*)
-      integer           :: f_len
+      integer :: f_len
 
       integer :: i
 
@@ -105,10 +105,10 @@ contains
    function c_f_len_ptr_(c_str) result (f_len)
 
       type(C_PTR), value :: c_str
-      integer            :: f_len
+      integer :: f_len
 
       character(C_CHAR), pointer :: p(:)
-      integer                    :: i
+      integer :: i
 
       ! Determine the Fortran length of the C string (expressed as a
       ! pointer to a NULL-termninated sequence)
@@ -139,10 +139,10 @@ contains
    end function c_f_len_ptr_
 
    !****
-   
+
    function c_f_string_arr_(c_str) result (f_str)
 
-      character(C_CHAR)         :: c_str(*)
+      character(C_CHAR) :: c_str(*)
       character(:), allocatable :: f_str
 
       integer :: n
@@ -153,7 +153,7 @@ contains
 
       n = c_f_len(c_str)
 
-      allocate(character(LEN=c_f_len(c_str))::f_str)
+      allocate(character(LEN = c_f_len(c_str)) :: f_str)
 
       copy_loop : do i = 1, n
          f_str(i:i) = c_str(i)
@@ -169,12 +169,12 @@ contains
 
    function c_f_string_ptr_(c_str) result (f_str)
 
-      type(C_PTR), value        :: c_str
+      type(C_PTR), value :: c_str
       character(:), allocatable :: f_str
 
       character(C_CHAR), pointer :: p(:)
-      integer                    :: n
-      integer                    :: i
+      integer :: n
+      integer :: i
 
       ! Convert the C string (expressed as a pointer to a
       ! NULL-terminated sequence) into a Fortran string
@@ -184,8 +184,8 @@ contains
          call c_f_pointer(c_str, p, [HUGE(0)])
 
          n = c_f_len(p)
-         
-         allocate(character(LEN=n)::f_str)
+
+         allocate(character(LEN = n) :: f_str)
 
          copy_loop : do i = 1, n
             f_str(i:i) = p(i)
@@ -193,7 +193,7 @@ contains
 
       else
 
-         allocate(character(LEN=0)::f_str)
+         allocate(character(LEN = 0) :: f_str)
 
       endif
 

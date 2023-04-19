@@ -31,14 +31,15 @@ def check_skip(path):
 
 write = re.compile("^ *write\([*a-zA-Z0-9]+\,[*]\)$")
 
+
 def replace(match):
     return match.string.split(',')[0] + ",'(A)')"
+
 
 if len(sys.argv) > 1:
     files = sys.argv[1:]
 else:
     files = Path("./").rglob("*.f90")
-
 
 for file in Path("./").rglob("*.f90"):
     if check_skip(file):

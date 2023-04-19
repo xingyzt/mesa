@@ -25,337 +25,337 @@
 
 module math_lib
 
-  ! Uses
+   ! Uses
 
-  use const_lib, only: dp, PI
+   use const_lib, only : dp, PI
 
-  use math_io
-  use math_pown
-  use math_def
+   use math_io
+   use math_pown
+   use math_def
 
-  use IEEE_ARITHMETIC
+   use IEEE_ARITHMETIC
 
-  ! No implicit typing
+   ! No implicit typing
 
-  implicit none
+   implicit none
 
-  ! Parameter definitions
+   ! Parameter definitions
 
-  character(LEN=16), parameter :: MATH_BACKEND = 'INTRINSIC'
+   character(LEN = 16), parameter :: MATH_BACKEND = 'INTRINSIC'
 
-  ! Interfaces
+   ! Interfaces
 
-  ! Generic interfaces
+   ! Generic interfaces
 
-  interface safe_sqrt
-     module procedure safe_sqrt_
-  end interface safe_sqrt
+   interface safe_sqrt
+      module procedure safe_sqrt_
+   end interface safe_sqrt
 
-  interface safe_log
-     module procedure safe_log_
-  end interface safe_log
+   interface safe_log
+      module procedure safe_log_
+   end interface safe_log
 
-  interface safe_log10
-     module procedure safe_log10_
-  end interface safe_log10
+   interface safe_log10
+      module procedure safe_log10_
+   end interface safe_log10
 
-  interface log1p
-     module procedure log1p_
-  end interface log1p
+   interface log1p
+      module procedure log1p_
+   end interface log1p
 
-  interface log2
-     module procedure log2_
-  end interface log2
+   interface log2
+      module procedure log2_
+   end interface log2
 
-  interface exp10
-     module procedure exp10_
-  end interface exp10
+   interface exp10
+      module procedure exp10_
+   end interface exp10
 
-  interface expm1
-     module procedure expm1_
-  end interface expm1
+   interface expm1
+      module procedure expm1_
+   end interface expm1
 
-  interface pow
-     module procedure pow_i_
-     module procedure pow_r_
-  end interface pow
+   interface pow
+      module procedure pow_i_
+      module procedure pow_r_
+   end interface pow
 
-  interface cospi
-     module procedure cospi_
-  end interface cospi
+   interface cospi
+      module procedure cospi_
+   end interface cospi
 
-  interface sinpi
-     module procedure sinpi_
-  end interface sinpi
+   interface sinpi
+      module procedure sinpi_
+   end interface sinpi
 
-  interface tanpi
-     module procedure tanpi_
-  end interface tanpi
+   interface tanpi
+      module procedure tanpi_
+   end interface tanpi
 
-  interface acospi
-     module procedure acospi_
-  end interface acospi
+   interface acospi
+      module procedure acospi_
+   end interface acospi
 
-  interface asinpi
-     module procedure asinpi_
-  end interface asinpi
+   interface asinpi
+      module procedure asinpi_
+   end interface asinpi
 
-  interface atanpi
-     module procedure atanpi_
-  end interface atanpi
+   interface atanpi
+      module procedure atanpi_
+   end interface atanpi
 
-  ! Module variables
+   ! Module variables
 
-  real(dp), save :: ln10_m
+   real(dp), save :: ln10_m
 
-  ! Access specifiers
+   ! Access specifiers
 
-  private
+   private
 
-  public :: MATH_BACKEND
+   public :: MATH_BACKEND
 
-  public :: math_init
-  public :: safe_sqrt
-  public :: safe_log
-  public :: safe_log10
-  public :: log1p
-  public :: log2
-  public :: exp10
-  public :: expm1
-  public :: powm1
-  public :: pow
-  public :: pow2
-  public :: pow3
-  public :: pow4
-  public :: pow5
-  public :: pow6
-  public :: pow7
-  public :: pow8
-  public :: cospi
-  public :: sinpi
-  public :: tanpi
-  public :: acospi
-  public :: asinpi
-  public :: atanpi
-  public :: str_to_vector
-  public :: str_to_double
-  public :: double_to_str
+   public :: math_init
+   public :: safe_sqrt
+   public :: safe_log
+   public :: safe_log10
+   public :: log1p
+   public :: log2
+   public :: exp10
+   public :: expm1
+   public :: powm1
+   public :: pow
+   public :: pow2
+   public :: pow3
+   public :: pow4
+   public :: pow5
+   public :: pow6
+   public :: pow7
+   public :: pow8
+   public :: cospi
+   public :: sinpi
+   public :: tanpi
+   public :: acospi
+   public :: asinpi
+   public :: atanpi
+   public :: str_to_vector
+   public :: str_to_double
+   public :: double_to_str
 
-  ! Procedures
+   ! Procedures
 
 contains
 
-  subroutine math_init ()
+   subroutine math_init ()
 
-    ln10_m = LOG(10._dp)
+      ln10_m = LOG(10._dp)
 
-    call precompute_some_zs()
+      call precompute_some_zs()
 
-  end subroutine math_init
+   end subroutine math_init
 
-  !****
+   !****
 
-  elemental function safe_sqrt_ (x) result (sqrt_x)
+   elemental function safe_sqrt_ (x) result (sqrt_x)
 
-    real(dp), intent(in) :: x
-    real(dp)             :: sqrt_x
+      real(dp), intent(in) :: x
+      real(dp) :: sqrt_x
 
-    sqrt_x = SQRT(MAX(x, 0._dp))
+      sqrt_x = SQRT(MAX(x, 0._dp))
 
-  end function safe_sqrt_
-  
-  !****
+   end function safe_sqrt_
 
-  elemental function safe_log_ (x) result (log_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log_x
+   elemental function safe_log_ (x) result (log_x)
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+      real(dp), intent(in) :: x
+      real(dp) :: log_x
 
-       log_x = -99._dp
+      if (.NOT. IEEE_IS_FINITE(x)) then
 
-    else
+         log_x = -99._dp
 
-       log_x = LOG(MAX(1.E-99_dp, x))
+      else
 
-    end if
+         log_x = LOG(MAX(1.E-99_dp, x))
 
-  end function safe_log_
+      end if
 
-  !****
+   end function safe_log_
 
-  elemental function safe_log10_ (x) result (log10_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log10_x
+   elemental function safe_log10_ (x) result (log10_x)
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+      real(dp), intent(in) :: x
+      real(dp) :: log10_x
 
-       log10_x = -99._dp
+      if (.NOT. IEEE_IS_FINITE(x)) then
 
-    else
+         log10_x = -99._dp
 
-       log10_x = LOG10(MAX(1.E-99_dp, x))
+      else
 
-    end if
+         log10_x = LOG10(MAX(1.E-99_dp, x))
 
-  end function safe_log10_
+      end if
 
-  !****
+   end function safe_log10_
 
-  elemental function log1p_ (x) result (log1p_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log1p_x
+   elemental function log1p_ (x) result (log1p_x)
 
-    log1p_x = LOG(1._dp + x)
+      real(dp), intent(in) :: x
+      real(dp) :: log1p_x
 
-  end function log1p_
+      log1p_x = LOG(1._dp + x)
 
-  !****
+   end function log1p_
 
-  elemental function log2_ (x) result (log2_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: log2_x
+   elemental function log2_ (x) result (log2_x)
 
-    log2_x = LOG(x)/LOG(2._dp)
+      real(dp), intent(in) :: x
+      real(dp) :: log2_x
 
-  end function log2_
+      log2_x = LOG(x) / LOG(2._dp)
 
-  !****
+   end function log2_
 
-  elemental function exp10_ (x) result (exp10_x)
+   !****
 
-    real(dp), intent(in) :: x
-    real(dp)             :: exp10_x
+   elemental function exp10_ (x) result (exp10_x)
 
-    integer :: ix
-    integer :: i
+      real(dp), intent(in) :: x
+      real(dp) :: exp10_x
 
-    ix = FLOOR(x)
+      integer :: ix
+      integer :: i
 
-    if (x == ix) then ! integer power of 10
+      ix = FLOOR(x)
 
-       exp10_x = 1._dp
+      if (x == ix) then ! integer power of 10
 
-       do i = 1, ABS(ix)
-          exp10_x = exp10_x*10._dp
-       end do
-       
-       if (ix < 0) exp10_x = 1._dp/exp10_x
+         exp10_x = 1._dp
 
-    else
+         do i = 1, ABS(ix)
+            exp10_x = exp10_x * 10._dp
+         end do
 
-       exp10_x = EXP(x*ln10_m)
+         if (ix < 0) exp10_x = 1._dp / exp10_x
 
-    endif
+      else
 
-  end function exp10_
+         exp10_x = EXP(x * ln10_m)
 
-  !****
+      endif
 
-  elemental function expm1_ (x) result (expm1_x)
+   end function exp10_
 
-    real(dp), intent(in) :: x
-    real(dp)             :: expm1_x
+   !****
 
-    expm1_x = EXP(x) - 1._dp
+   elemental function expm1_ (x) result (expm1_x)
 
-  end function expm1_
+      real(dp), intent(in) :: x
+      real(dp) :: expm1_x
 
-  !****
+      expm1_x = EXP(x) - 1._dp
 
-  elemental function pow_i_ (x, iy) result (pow_x)
+   end function expm1_
 
-    real(dp), intent(in) :: x
-    integer, intent(in)  :: iy
-    real(dp)             :: pow_x
+   !****
 
-    pow_x = x**iy
-    
-  end function pow_i_
+   elemental function pow_i_ (x, iy) result (pow_x)
 
-  !****
+      real(dp), intent(in) :: x
+      integer, intent(in) :: iy
+      real(dp) :: pow_x
 
-  elemental function pow_r_ (x, y) result (pow_x)
+      pow_x = x**iy
 
-    real(dp), intent(in) :: x
-    real(dp), intent(in) :: y
-    real(dp)             :: pow_x
+   end function pow_i_
 
-    pow_x = x**y
-    
-  end function pow_r_
+   !****
 
-  !****
+   elemental function pow_r_ (x, y) result (pow_x)
 
-  elemental function cospi_ (x) result (cospi_x)
+      real(dp), intent(in) :: x
+      real(dp), intent(in) :: y
+      real(dp) :: pow_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: cospi_x
+      pow_x = x**y
 
-    cospi_x = COS(x*PI)
+   end function pow_r_
 
-  end function cospi_
+   !****
 
-  !****
+   elemental function cospi_ (x) result (cospi_x)
 
-  elemental function sinpi_ (x) result (sinpi_x)
+      real(dp), intent(in) :: x
+      real(dp) :: cospi_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: sinpi_x
+      cospi_x = COS(x * PI)
 
-    sinpi_x = SIN(x*PI)
+   end function cospi_
 
-  end function sinpi_
+   !****
 
-  !****
+   elemental function sinpi_ (x) result (sinpi_x)
 
-  elemental function tanpi_ (x) result (tanpi_x)
+      real(dp), intent(in) :: x
+      real(dp) :: sinpi_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: tanpi_x
+      sinpi_x = SIN(x * PI)
 
-    tanpi_x = TAN(x*PI)
+   end function sinpi_
 
-  end function tanpi_
+   !****
 
-  !****
+   elemental function tanpi_ (x) result (tanpi_x)
 
-  elemental function acospi_ (x) result (acospi_x)
+      real(dp), intent(in) :: x
+      real(dp) :: tanpi_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: acospi_x
+      tanpi_x = TAN(x * PI)
 
-    acospi_x = ACOS(x)/PI
+   end function tanpi_
 
-  end function acospi_
+   !****
 
-  !****
+   elemental function acospi_ (x) result (acospi_x)
 
-  elemental function asinpi_ (x) result (asinpi_x)
+      real(dp), intent(in) :: x
+      real(dp) :: acospi_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: asinpi_x
+      acospi_x = ACOS(x) / PI
 
-    asinpi_x = ASIN(x)/PI
+   end function acospi_
 
-  end function asinpi_
+   !****
 
-  !****
+   elemental function asinpi_ (x) result (asinpi_x)
 
-  elemental function atanpi_ (x) result (atanpi_x)
+      real(dp), intent(in) :: x
+      real(dp) :: asinpi_x
 
-    real(dp), intent(in) :: x
-    real(dp)             :: atanpi_x
+      asinpi_x = ASIN(x) / PI
 
-    atanpi_x = ATAN(x)/PI
+   end function asinpi_
 
-  end function atanpi_
+   !****
 
-  include 'precompute_zs.inc'
+   elemental function atanpi_ (x) result (atanpi_x)
+
+      real(dp), intent(in) :: x
+      real(dp) :: atanpi_x
+
+      atanpi_x = ATAN(x) / PI
+
+   end function atanpi_
+
+include 'precompute_zs.inc'
 
 
 end module math_lib

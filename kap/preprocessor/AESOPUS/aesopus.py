@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import h5py
 import io
 import os
 import sys
-import yaml
 
+import h5py
 import numpy as np
-
+import yaml
 
 HDF5_OPTS = {'dtype': 'float32', 'compression': 'gzip'}
 """dict: options used when creating non-scalar HDF5 datasets
@@ -104,7 +103,7 @@ def read_AESOPUS_tables(filename, nT):
     for l, description in tables.items():
         # there are 103 + nT lines between the TABLE line and the end
         nl = 103 + nT
-        table = data[l:l+nl]
+        table = data[l:l + nl]
         t = AesopusTable(description, table)
         extracted_tables.append(t)
 
@@ -168,7 +167,6 @@ def write_AESOPUS_tables(tables, h5group, nT, nR):
 
 
 def main(config):
-
     # one must manually extract these values from the AESOPUS file
     # they depend on the solar abundance pattern
     Zsun = config['Zsun']
@@ -186,7 +184,6 @@ def main(config):
 
     # open HDF5 file
     with h5py.File(config['output'], "w") as h5file:
-
         # calculate and store reference composition values
         fCO_ref = np.log10(C_div_Z_sun / O_div_Z_sun)
         fC_ref = np.log10(C_div_Z_sun)
@@ -206,7 +203,6 @@ def main(config):
 
         # now, parse and store the tables associated with each Z
         for Z, table, in zip(AESOPUS_Zs, config['files']):
-
             # the Z_id string must be such that a lexicographic sort
             # gives the same order as a numerical sort in Z
             Z_id = f'{Z:8.6f}'
@@ -219,7 +215,6 @@ def main(config):
 
 
 if __name__ == '__main__':
-
     with open(sys.argv[1]) as f:
         y = yaml.safe_load(f.read())
 

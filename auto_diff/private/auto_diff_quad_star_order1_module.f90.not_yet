@@ -1,13 +1,13 @@
 module auto_diff_quad_star_order1_module
-      use const_def
-      use utils_lib
-      use support_functions_quad
-      use math_lib
-      use auto_diff_real_star_order1_module, only: auto_diff_star_num_vars
-   
-      implicit none
-      
-      private
+   use const_def
+   use utils_lib
+   use support_functions_quad
+   use math_lib
+   use auto_diff_real_star_order1_module, only: auto_diff_star_num_vars
+
+   implicit none
+
+   private
       
       
    public :: auto_diff_quad_star_order1, &

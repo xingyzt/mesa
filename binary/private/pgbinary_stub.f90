@@ -27,8 +27,8 @@ module pgbinary
 
    use binary_def
    use const_def
-   use chem_def, only : category_name
-   use rates_def, only : i_rate
+   use chem_def, only :category_name
+   use rates_def, only :i_rate
 
    implicit none
 
@@ -37,7 +37,7 @@ contains
 
    ! pgbinary interface
    subroutine start_new_run_for_pgbinary(b, ierr) ! reset logs
-      use binary_def, only : binary_info
+      use binary_def, only :binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       ierr = 0
@@ -45,7 +45,7 @@ contains
 
 
    subroutine restart_run_for_pgbinary(b, ierr)
-      use binary_def, only : binary_info
+      use binary_def, only :binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       ierr = 0
@@ -53,7 +53,7 @@ contains
 
 
    subroutine read_pgbinary_controls(b, ierr)
-      use binary_def, only : binary_info
+      use binary_def, only :binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       ierr = 0
@@ -61,7 +61,7 @@ contains
 
 
    subroutine read_pgbinary_inlist(b, inlist_fname, ierr)
-      use binary_def, only : binary_info
+      use binary_def, only :binary_info
       type (binary_info), pointer :: b
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
@@ -69,7 +69,7 @@ contains
    end subroutine read_pgbinary_inlist
 
    subroutine update_pgbinary_plots(b, must_write_files, ierr)
-      use binary_def, only : binary_info
+      use binary_def, only :binary_info
       type (binary_info), pointer :: b
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
@@ -83,11 +83,10 @@ contains
       character (len = *), intent(out) :: name
       name = ''
    end subroutine do_create_file_name
-   
 
 
    subroutine do_write_plot_to_file(b, p, filename, ierr)
-      use binary_def, only : binary_info, pgbinary_win_file_data
+      use binary_def, only :binary_info, pgbinary_win_file_data
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
@@ -121,7 +120,7 @@ contains
       integer, intent(out) :: ierr
       logical :: fexists
       ierr = 0
-      
+
    end subroutine do_restart_run_for_pgbinary
 
 
@@ -130,7 +129,7 @@ contains
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
       ierr = 0
-     
+
    end subroutine do_read_pgbinary_controls
 
 
@@ -138,7 +137,7 @@ contains
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       ierr = 0
-      
+
    end subroutine set_win_file_data
 
 
@@ -190,7 +189,7 @@ contains
       include 'formats'
 
       ierr = 0
-     
+
    end subroutine update_pgbinary_history_file
 
 

@@ -100,54 +100,54 @@ contains
       ybot, ytop, subplot, Star_title, Star_txt_scale_factor, &
       Star_plot_name, Star_number, ierr)
 
-      use utils_lib, only : StrLowCase
-      use star_lib, only : read_pgstar_inlist
-      use pgstar, only : update_pgstar_data, update_pgstar_history_file
-      use pgstar_grid, only : do_grid1_plot, do_grid2_plot, do_grid3_plot, &
+      use utils_lib, only :StrLowCase
+      use star_lib, only :read_pgstar_inlist
+      use pgstar, only :update_pgstar_data, update_pgstar_history_file
+      use pgstar_grid, only :do_grid1_plot, do_grid2_plot, do_grid3_plot, &
          do_grid4_plot, do_grid5_plot, do_grid6_plot, do_grid7_plot, &
          do_grid8_plot, do_grid9_plot
-      use pgstar_kipp, only : do_Kipp_Plot
-      use pgstar_L_R, only : do_L_R_Plot
-      use pgstar_L_v, only : do_L_v_Plot
-      use pgstar_L_Teff, only : do_L_Teff_Plot
-      use pgstar_logL_R, only : do_logL_R_Plot
-      use pgstar_logL_v, only : do_logL_v_Plot
-      use pgstar_logL_Teff, only : do_logL_Teff_Plot
-      use pgstar_r_L, only : do_R_L_Plot
-      use pgstar_r_Teff, only : do_R_Teff_Plot
-      use pgstar_logg_Teff, only : do_logg_Teff_Plot
-      use pgstar_logg_logT, only : do_logg_logT_Plot
-      use pgstar_dPg_dnu, only : do_dPg_dnu_Plot
-      use pgstar_hr, only : do_HR_Plot
-      use pgstar_trho, only : do_TRho_Plot
-      use pgstar_dynamo, only : do_Dynamo_plot
-      use pgstar_mixing_Ds, only : do_Mixing_plot
-      use pgstar_trho_profile, only : do_TRho_Profile_plot
-      use pgstar_power, only : do_power_plot
-      use pgstar_mode_prop, only : do_mode_propagation_plot
-      use pgstar_abundance, only : do_abundance_plot
-      use pgstar_summary_burn, only : do_summary_burn_plot
-      use pgstar_summary_profile, only : do_summary_profile_plot
-      use pgstar_summary_history, only : do_summary_history_plot
-      use pgstar_network, only : do_network_plot
-      use pgstar_production, only : do_production_plot
-      use pgstar_summary, only : &
+      use pgstar_kipp, only :do_Kipp_Plot
+      use pgstar_L_R, only :do_L_R_Plot
+      use pgstar_L_v, only :do_L_v_Plot
+      use pgstar_L_Teff, only :do_L_Teff_Plot
+      use pgstar_logL_R, only :do_logL_R_Plot
+      use pgstar_logL_v, only :do_logL_v_Plot
+      use pgstar_logL_Teff, only :do_logL_Teff_Plot
+      use pgstar_r_L, only :do_R_L_Plot
+      use pgstar_r_Teff, only :do_R_Teff_Plot
+      use pgstar_logg_Teff, only :do_logg_Teff_Plot
+      use pgstar_logg_logT, only :do_logg_logT_Plot
+      use pgstar_dPg_dnu, only :do_dPg_dnu_Plot
+      use pgstar_hr, only :do_HR_Plot
+      use pgstar_trho, only :do_TRho_Plot
+      use pgstar_dynamo, only :do_Dynamo_plot
+      use pgstar_mixing_Ds, only :do_Mixing_plot
+      use pgstar_trho_profile, only :do_TRho_Profile_plot
+      use pgstar_power, only :do_power_plot
+      use pgstar_mode_prop, only :do_mode_propagation_plot
+      use pgstar_abundance, only :do_abundance_plot
+      use pgstar_summary_burn, only :do_summary_burn_plot
+      use pgstar_summary_profile, only :do_summary_profile_plot
+      use pgstar_summary_history, only :do_summary_history_plot
+      use pgstar_network, only :do_network_plot
+      use pgstar_production, only :do_production_plot
+      use pgstar_summary, only :&
          do_Text_Summary1_plot, do_Text_Summary2_plot, do_Text_Summary3_plot, &
          do_Text_Summary4_plot, do_Text_Summary5_plot, do_Text_Summary6_plot, &
          do_Text_Summary7_plot, do_Text_Summary8_plot, do_Text_Summary9_plot
-      use pgstar_profile_panels, only : &
+      use pgstar_profile_panels, only :&
          do_Profile_Panels1_plot, do_Profile_Panels2_plot, do_Profile_Panels3_plot, &
          do_Profile_Panels4_plot, do_Profile_Panels5_plot, do_Profile_Panels6_plot, &
          do_Profile_Panels7_plot, do_Profile_Panels8_plot, do_Profile_Panels9_plot
-      use pgstar_history_panels, only : &
+      use pgstar_history_panels, only :&
          do_History_Panels1_plot, do_History_Panels2_plot, do_History_Panels3_plot, &
          do_History_Panels4_plot, do_History_Panels5_plot, do_History_Panels6_plot, &
          do_History_Panels7_plot, do_History_Panels8_plot, do_History_Panels9_plot
-      use pgstar_hist_track, only : &
+      use pgstar_hist_track, only :&
          do_History_Track1_plot, do_History_Track2_plot, do_History_Track3_plot, &
          do_History_Track4_plot, do_History_Track5_plot, do_History_Track6_plot, &
          do_History_Track7_plot, do_History_Track8_plot, do_History_Track9_plot
-      use pgstar_Color_Magnitude, only : &
+      use pgstar_Color_Magnitude, only :&
          do_Color_Magnitude1_plot, do_Color_Magnitude2_plot, do_Color_Magnitude3_plot, &
          do_Color_Magnitude4_plot, do_Color_Magnitude5_plot, do_Color_Magnitude6_plot, &
          do_Color_Magnitude7_plot, do_Color_Magnitude8_plot, do_Color_Magnitude9_plot

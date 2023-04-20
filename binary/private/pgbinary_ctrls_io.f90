@@ -1393,8 +1393,8 @@ contains
       integer, intent(in) :: level
       integer, intent(out) :: ierr
       logical, dimension(max_extra_inlists) :: read_extra
-      character (len=strlen) :: message
-      character (len=strlen), dimension(max_extra_inlists) :: extra
+      character (len = strlen) :: message
+      character (len = strlen), dimension(max_extra_inlists) :: extra
       integer :: unit, i
 
       ierr = 0
@@ -1429,18 +1429,18 @@ contains
 
       call store_pgbinary_controls(b, ierr)
 
- ! recursive calls to read other inlists
-         do i=1, max_extra_inlists
-            read_extra(i) = read_extra_pgbinary_inlist(i)
-            read_extra_pgbinary_inlist(i) = .false.
-            extra(i) = extra_pgbinary_inlist_name(i)
-            extra_pgbinary_inlist_name(i) = 'undefined'
-            
-            if (read_extra(i)) then
-               call read_pgbinary_file(b, extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
-         end do
+      ! recursive calls to read other inlists
+      do i = 1, max_extra_inlists
+         read_extra(i) = read_extra_pgbinary_inlist(i)
+         read_extra_pgbinary_inlist(i) = .false.
+         extra(i) = extra_pgbinary_inlist_name(i)
+         extra_pgbinary_inlist_name(i) = 'undefined'
+
+         if (read_extra(i)) then
+            call read_pgbinary_file(b, extra(i), level + 1, ierr)
+            if (ierr /= 0) return
+         end if
+      end do
 
    end subroutine read_pgbinary_file
 

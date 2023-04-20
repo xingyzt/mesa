@@ -12,7 +12,7 @@ module support_functions_quad
       module procedure log_int
    end interface log
 
-   interface max 
+   interface max
       module procedure max_int_quad
       module procedure max_quad_int
    end interface max
@@ -22,7 +22,7 @@ module support_functions_quad
       module procedure min_quad_int
    end interface min
 
-   contains
+contains
 
    pure real(qp) function sgn(x) result(res)
       real(qp), intent(in) :: x
@@ -52,7 +52,7 @@ module support_functions_quad
       real(qp) :: x_quad
 
       x_quad = x
-      z = pow(x_quad,y)
+      z = pow(x_quad, y)
    end function int_quad_pow
 
    pure real(qp) function int_int_pow(x, y) result(z)

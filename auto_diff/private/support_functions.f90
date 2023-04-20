@@ -12,7 +12,7 @@ module support_functions
       module procedure log_int
    end interface log
 
-   interface max 
+   interface max
       module procedure max_int_real
       module procedure max_real_int
    end interface max
@@ -22,7 +22,7 @@ module support_functions
       module procedure min_real_int
    end interface min
 
-   contains
+contains
 
    pure real(dp) function sgn(x) result(res)
       real(dp), intent(in) :: x
@@ -52,7 +52,7 @@ module support_functions
       real(dp) :: x_real
 
       x_real = x
-      z = pow(x_real,y)
+      z = pow(x_real, y)
    end function int_real_pow
 
    pure real(dp) function int_int_pow(x, y) result(z)

@@ -27,7 +27,7 @@ module run_star_extras
    use const_def
    use math_lib
    use binary_def
-   use utils_lib, only : mesa_error
+   use utils_lib, only: mesa_error
 
    implicit none
 

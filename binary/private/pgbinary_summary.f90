@@ -347,7 +347,7 @@ contains
       Text_Summary_name, ierr)
 
       use utils_lib
-      use pgstar_support, only :write_info_line_exp, write_info_line_flt, &
+      use pgstar_support, only: write_info_line_exp, write_info_line_flt, &
          write_info_line_int
 
       type (binary_info), pointer :: b
@@ -390,7 +390,7 @@ contains
 
 
       subroutine show_column(col, num_rows)
-         use binary_history, only :get_binary_history_specs, get_binary_history_values, get1_binary_hist_value
+         use binary_history, only: get_binary_history_specs, get_binary_history_values, get1_binary_hist_value
          integer, intent(in) :: col, num_rows
 
          real(dp) :: values(num_rows)

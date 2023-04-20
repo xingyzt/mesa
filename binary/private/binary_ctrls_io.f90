@@ -333,7 +333,7 @@ contains
 
 
    subroutine store_binary_controls(b, ierr)
-      use utils_lib, only :mkdir
+      use utils_lib, only: mkdir
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
 
@@ -727,7 +727,7 @@ contains
 
 
    subroutine get_binary_control(b, name, val, ierr)
-      use utils_lib, only :StrUpCase
+      use utils_lib, only: StrUpCase
       type (binary_info), pointer :: b
       character(len = *), intent(in) :: name
       character(len = *), intent(out) :: val

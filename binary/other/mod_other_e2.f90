@@ -24,8 +24,8 @@
 ! ***********************************************************************
 
 module mod_other_e2
-   use binary_def, only :binary_info, binary_ptr
-   use star_def, only :star_info, star_ptr
+   use binary_def, only: binary_info, binary_ptr
+   use star_def, only: star_info, star_ptr
 
    ! NOTE: remember to set true:
    ! use_other_e2 = .true.
@@ -121,7 +121,7 @@ module mod_other_e2
 contains
 
    subroutine null_other_e2(id, e2, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: id
       real(dp), intent(out) :: e2
       integer, intent(out) :: ierr

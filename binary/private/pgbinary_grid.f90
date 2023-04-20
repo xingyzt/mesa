@@ -296,22 +296,22 @@ contains
       Grid_plot_pad_bot, &
       ierr)
 
-      use utils_lib, only :StrLowCase
-      use pgbinary_summary_history, only :do_summary_history_plot
-      use pgbinary_summary, only :&
+      use utils_lib, only: StrLowCase
+      use pgbinary_summary_history, only: do_summary_history_plot
+      use pgbinary_summary, only: &
          do_Text_Summary1_plot, do_Text_Summary2_plot, do_Text_Summary3_plot, &
          do_Text_Summary4_plot, do_Text_Summary5_plot, do_Text_Summary6_plot, &
          do_Text_Summary7_plot, do_Text_Summary8_plot, do_Text_Summary9_plot
-      use pgbinary_history_panels, only :&
+      use pgbinary_history_panels, only: &
          do_History_Panels1_plot, do_History_Panels2_plot, do_History_Panels3_plot, &
          do_History_Panels4_plot, do_History_Panels5_plot, do_History_Panels6_plot, &
          do_History_Panels7_plot, do_History_Panels8_plot, do_History_Panels9_plot
-      use pgbinary_hist_track, only :&
+      use pgbinary_hist_track, only: &
          do_History_Track1_plot, do_History_Track2_plot, do_History_Track3_plot, &
          do_History_Track4_plot, do_History_Track5_plot, do_History_Track6_plot, &
          do_History_Track7_plot, do_History_Track8_plot, do_History_Track9_plot
-      use pgbinary_star, only :do_Star1_plot, do_Star2_plot
-      use pgbinary_orbit, only :do_orbit_plot
+      use pgbinary_star, only: do_Star1_plot, do_Star2_plot
+      use pgbinary_orbit, only: do_orbit_plot
 
       type (binary_info), pointer :: b
       logical, intent(in) :: subplot

@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_binary_wind_transfer
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set true:
    ! use_other_binary_wind_transfer = .true.

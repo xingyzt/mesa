@@ -69,8 +69,8 @@ contains
    subroutine orbit_panel(b, device_id, &
       winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
 
-      use num_lib, only :safe_root_with_guess
-      use math_lib, only :pow
+      use num_lib, only: safe_root_with_guess
+      use math_lib, only: pow
 
       type (binary_info), pointer :: b
       integer, intent(in) :: device_id

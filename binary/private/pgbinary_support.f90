@@ -27,9 +27,9 @@ module pgbinary_support
 
    use binary_private_def
    use const_def
-   use rates_def, only :i_rate
+   use rates_def, only: i_rate
    use utils_lib
-   use pgstar_support, only :Set_Colours, do1_pgmtxt, &
+   use pgstar_support, only: Set_Colours, do1_pgmtxt, &
       clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
       clr_anonymous, colormap_offset, colormap_last, colormap_size, &
@@ -95,7 +95,7 @@ contains
 
 
    subroutine init_pgbinary(ierr)
-      use pgstar_support, only :init_pgstar
+      use pgstar_support, only: init_pgstar
       integer, intent(out) :: ierr
 
       call init_pgstar(ierr)
@@ -137,7 +137,7 @@ contains
 
 
    subroutine check_file(b, p, ierr)
-      use utils_lib, only :mkdir
+      use utils_lib, only: mkdir
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       integer, intent(out) :: ierr
@@ -260,7 +260,7 @@ contains
 
 
    logical function get1_hist_yvec(b, step_min, step_max, n, name, vec)
-      use utils_lib, only :integer_dict_lookup
+      use utils_lib, only: integer_dict_lookup
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
       character (len = *) :: name

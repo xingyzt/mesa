@@ -29,7 +29,7 @@ module binary_irradiation
    use const_def
    use star_lib
    use star_def
-   use math_lib, only :safe_log10, pow2
+   use math_lib, only: safe_log10, pow2
    use binary_def
 
    implicit none

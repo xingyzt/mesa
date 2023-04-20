@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_mdot_edd
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set true:
    ! use_other_mdot_edd = .true.
@@ -114,7 +114,7 @@ module mod_other_mdot_edd
 contains
 
    subroutine null_other_mdot_edd(binary_id, mdot_edd, mdot_edd_eta, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       real(dp), intent(out) :: mdot_edd
       real(dp), intent(out) :: mdot_edd_eta

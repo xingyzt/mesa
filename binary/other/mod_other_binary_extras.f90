@@ -133,7 +133,7 @@ contains
 
 
    integer function null_how_many_extra_binary_history_header_items(binary_id)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       integer, intent(in) :: binary_id
       null_how_many_extra_binary_history_header_items = 0
    end function null_how_many_extra_binary_history_header_items

@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_binary_jdot
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set one of:
    ! use_other_jdot_mb = .true.

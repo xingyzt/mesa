@@ -28,7 +28,7 @@ module run_binary_support
    use utils_lib
    use binary_def
    use binary_private_def
-   use binary_ctrls_io, only :do_one_binary_setup
+   use binary_ctrls_io, only: do_one_binary_setup
    use binary_do_one_utils
    use binary_ce
    use binary_photos
@@ -46,8 +46,8 @@ contains
       inlist_fname_arg)
 
       use binary_job_ctrls_io
-      use binary_mdot, only :adjust_mdots, set_accretion_composition
-      use binary_tides, only :sync_spin_orbit_torque
+      use binary_mdot, only: adjust_mdots, set_accretion_composition
+      use binary_tides, only: sync_spin_orbit_torque
       use binary_evolve
       use mod_other_rlo_mdot
       use mod_other_implicit_rlo
@@ -69,7 +69,7 @@ contains
       use binary_history
       use binary_history_specs
       use run_star_support
-      use pgbinary, only :read_pgbinary_inlist, update_pgbinary_plots, &
+      use pgbinary, only: read_pgbinary_inlist, update_pgbinary_plots, &
          start_new_run_for_pgbinary, restart_run_for_pgbinary
 
       logical, intent(in) :: tst
@@ -346,7 +346,7 @@ contains
          call ce_init(b, doing_restart, ierr)
       end if
 
-      evolve_loop :do while(continue_evolve_loop) ! evolve one step per loop
+      evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
 
          if (b% point_mass_i /= 0) then
             num_stars = 1
@@ -383,7 +383,7 @@ contains
             write(*, *) "CE flag is on!!"
          end if
 
-         step_loop :do ! may need to repeat this loop
+         step_loop: do ! may need to repeat this loop
 
             result = b% extras_binary_start_step(b% binary_id, ierr)
             if (ierr /= 0) then
@@ -885,7 +885,7 @@ contains
 
    subroutine do_binary_job_controls_after(binary_id, b, restart, ierr)
       use binary_utils
-      use binary_evolve, only :binary_finish_step
+      use binary_evolve, only: binary_finish_step
       integer, intent(in) :: binary_id
       type (binary_info), pointer :: b
       logical, intent(in) :: restart

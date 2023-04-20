@@ -33,7 +33,7 @@ module binary_mdot
    use binary_def
    use binary_wind
    use binary_ce
-   use utils_lib, only :mesa_error
+   use utils_lib, only: mesa_error
 
    implicit none
 
@@ -329,7 +329,7 @@ contains
 
    real(dp) function pick_mdot_for_implicit_rlo(&
       b, new_function_to_solve, mdot_current, use_sum, ierr) result(mdot_next)
-      use num_lib, only :find0_quadratic, find0
+      use num_lib, only: find0_quadratic, find0
       type(binary_info), pointer :: b
       real(dp), intent(in) :: new_function_to_solve, mdot_current
       logical, intent(in) :: use_sum
@@ -431,7 +431,7 @@ contains
 
 
    subroutine eval_mdot_edd(binary_id, mdot_edd, mdot_edd_eta, ierr)
-      use utils_lib, only :is_bad
+      use utils_lib, only: is_bad
 
       integer, intent(in) :: binary_id
       real(dp), intent(out) :: mdot_edd ! eddington accretion rate
@@ -498,7 +498,7 @@ contains
    end subroutine eval_mdot_edd
 
    subroutine adjust_mdots(b)
-      use binary_wind, only :eval_wind_xfer_fractions
+      use binary_wind, only: eval_wind_xfer_fractions
       type (binary_info), pointer :: b
 
       real(dp) :: fixed_xfer_fraction, actual_mtransfer_rate
@@ -993,7 +993,7 @@ contains
    end subroutine eval_accreted_material_j
 
    subroutine set_accretion_composition(b, acc_index)
-      use chem_def, only :chem_isos
+      use chem_def, only: chem_isos
       type (binary_info), pointer :: b
       integer, intent(in) :: acc_index ! index of star that gains mass
 

@@ -63,7 +63,7 @@ contains
 
    subroutine data_for_binary_history_columns(&
       binary_id, n, names, vals, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id, n
       character (len = 80) :: names(n)
       real(dp) :: vals(n)
@@ -115,7 +115,7 @@ contains
    end subroutine do_get_data_for_binary_history_columns
 
    subroutine do_binary_history_info(b, write_flag, ierr)
-      use utils_lib, only :integer_dict_create_hash, integer_dict_free
+      use utils_lib, only: integer_dict_create_hash, integer_dict_free
       type (binary_info), pointer :: b
       logical, intent(in) :: write_flag
       integer, intent(out) :: ierr
@@ -374,7 +374,7 @@ contains
 
 
       subroutine do_name(j, col_name)
-         use utils_lib, only :integer_dict_define
+         use utils_lib, only: integer_dict_define
          integer, intent(in) :: j
          character (len = *), intent(in) :: col_name
          if (write_flag) write(io, fmt = txt_fmt, advance = 'no') trim(col_name)
@@ -437,7 +437,7 @@ contains
 
 
       subroutine do_val(j, val)
-         use utils_lib, only :is_bad
+         use utils_lib, only: is_bad
          integer, intent(in) :: j
          real(dp), intent(in) :: val
          if (write_flag) then
@@ -839,7 +839,7 @@ contains
 
    logical function get1_binary_hist_value(b, name, val)
       ! includes other_history_columns from run_star_extras
-      use utils_lib, only :integer_dict_lookup
+      use utils_lib, only: integer_dict_lookup
       type (binary_info), pointer :: b
       character (len = *) :: name
       real(dp), intent(out) :: val

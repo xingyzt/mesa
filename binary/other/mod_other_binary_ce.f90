@@ -25,7 +25,7 @@
 
 module mod_other_binary_ce
    use star_def
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set true:
    ! use_other_CE_rlo_mdot = .true.
@@ -113,7 +113,7 @@ module mod_other_binary_ce
 contains
 
    subroutine null_other_CE_init(binary_id, restart, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       logical, intent(in) :: restart
       integer, intent(out) :: ierr
@@ -128,7 +128,7 @@ contains
    end subroutine null_other_CE_init
 
    subroutine null_other_CE_rlo_mdot(binary_id, mdot, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       real(dp), intent(out) :: mdot
       integer, intent(out) :: ierr
@@ -144,7 +144,7 @@ contains
    end subroutine null_other_CE_rlo_mdot
 
    integer function null_other_CE_binary_evolve_step(binary_id)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       integer :: ierr
       type (binary_info), pointer :: b

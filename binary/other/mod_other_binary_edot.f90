@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_binary_edot
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set one of:
    ! use_other_edot_tidal = .true.
@@ -114,7 +114,7 @@ module mod_other_binary_edot
 contains
 
    subroutine null_other_edot_tidal(binary_id, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b

@@ -32,7 +32,7 @@ module binary_history_specs
    use math_lib
    use binary_def
    use binary_private_def
-   use utils_Lib, only :StrLowCase
+   use utils_Lib, only: StrLowCase
 
    implicit none
 
@@ -44,7 +44,7 @@ contains
       b, level, capacity, spec, history_columns_file, ierr)
       use utils_lib
       use utils_def
-      use const_def, only :mesa_dir
+      use const_def, only: mesa_dir
       type (binary_info), pointer :: b
       integer, intent(in) :: level
       integer, intent(inout) :: capacity
@@ -215,7 +215,7 @@ contains
    end function do1_binary_history_spec
 
    subroutine set_binary_history_columns(b, binary_history_columns_file, ierr)
-      use utils_lib, only :realloc_integer
+      use utils_lib, only: realloc_integer
       type(binary_info), pointer :: b
       character (len = *), intent(in) :: binary_history_columns_file
       integer, intent(out) :: ierr

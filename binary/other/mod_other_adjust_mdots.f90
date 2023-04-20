@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_adjust_mdots
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set true:
    ! use_other_adjust_mdots = .true.
@@ -110,7 +110,7 @@ module mod_other_adjust_mdots
 contains
 
    subroutine null_other_adjust_mdots(binary_id, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b

@@ -70,7 +70,7 @@ include "binary_test_suite_extras.inc"
 
 
    integer function how_many_extra_binary_history_header_items(binary_id)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       integer, intent(in) :: binary_id
       how_many_extra_binary_history_header_items = 0
    end function how_many_extra_binary_history_header_items
@@ -92,13 +92,13 @@ include "binary_test_suite_extras.inc"
 
 
    integer function how_many_extra_binary_history_columns(binary_id)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       integer, intent(in) :: binary_id
       how_many_extra_binary_history_columns = 0
    end function how_many_extra_binary_history_columns
 
    subroutine data_for_extra_binary_history_columns(binary_id, n, names, vals, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       type (binary_info), pointer :: b
       integer, intent(in) :: binary_id
       integer, intent(in) :: n

@@ -27,10 +27,10 @@ module pgbinary
 
    use binary_def
    use const_def
-   use chem_def, only :category_name
-   use rates_def, only :i_rate
+   use chem_def, only: category_name
+   use rates_def, only: i_rate
    use pgbinary_support
-   use pgstar, only :pgstar_clear, read_pgstar_data
+   use pgstar, only: pgstar_clear, read_pgstar_data
 
    implicit none
 
@@ -39,7 +39,7 @@ contains
 
    ! pgbinary interface
    subroutine start_new_run_for_pgbinary(b, ierr) ! reset logs
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       call do_start_new_run_for_pgbinary(b, ierr)
@@ -47,7 +47,7 @@ contains
 
 
    subroutine restart_run_for_pgbinary(b, ierr)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       call do_restart_run_for_pgbinary(b, ierr)
@@ -55,7 +55,7 @@ contains
 
 
    subroutine read_pgbinary_controls(b, ierr)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       call do_read_pgbinary_controls(b, 'inlist', ierr)
@@ -63,7 +63,7 @@ contains
 
 
    subroutine read_pgbinary_inlist(b, inlist_fname, ierr)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
@@ -71,7 +71,7 @@ contains
    end subroutine read_pgbinary_inlist
 
    subroutine update_pgbinary_plots(b, must_write_files, ierr)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
@@ -82,7 +82,7 @@ contains
 
 
    subroutine do_create_file_name(b, dir, prefix, name)
-      use pgbinary_support, only :create_file_name
+      use pgbinary_support, only: create_file_name
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
@@ -91,8 +91,8 @@ contains
 
 
    subroutine do_write_plot_to_file(b, p, filename, ierr)
-      use binary_def, only :binary_info, pgbinary_win_file_data
-      use pgbinary_support, only :write_plot_to_file
+      use binary_def, only: binary_info, pgbinary_win_file_data
+      use pgbinary_support, only: write_plot_to_file
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
@@ -103,7 +103,7 @@ contains
 
    subroutine do_show_pgbinary_annotations(&
       b, show_annotation1, show_annotation2, show_annotation3)
-      use pgbinary_support, only :show_annotations
+      use pgbinary_support, only: show_annotations
       type (binary_info), pointer :: b
       logical, intent(in) :: &
          show_annotation1, show_annotation2, show_annotation3
@@ -161,7 +161,7 @@ contains
 
 
    subroutine do_read_pgbinary_controls(b, inlist_fname, ierr)
-      use pgbinary_ctrls_io, only :read_pgbinary
+      use pgbinary_ctrls_io, only: read_pgbinary
       type (binary_info), pointer :: b
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
@@ -176,23 +176,23 @@ contains
 
 
    subroutine set_win_file_data(b, ierr)
-      use pgbinary_summary_history, only :summary_history_plot
-      use pgbinary_grid, only :&
+      use pgbinary_summary_history, only: summary_history_plot
+      use pgbinary_grid, only: &
          grid1_plot, grid2_plot, grid3_plot, grid4_plot, &
          grid5_plot, grid6_plot, grid7_plot, grid8_plot, grid9_plot
-      use pgbinary_summary, only :&
+      use pgbinary_summary, only: &
          Text_Summary1_Plot, Text_Summary2_Plot, Text_Summary3_Plot, &
          Text_Summary4_Plot, Text_Summary5_Plot, Text_Summary6_Plot, &
          Text_Summary7_Plot, Text_Summary8_Plot, Text_Summary9_Plot
-      use pgbinary_history_panels, only :&
+      use pgbinary_history_panels, only: &
          History_Panels1_plot, History_Panels2_plot, History_Panels3_plot, &
          History_Panels4_plot, History_Panels5_plot, History_Panels6_plot, &
          History_Panels7_plot, History_Panels8_plot, History_Panels9_plot
-      use pgbinary_hist_track, only :&
+      use pgbinary_hist_track, only: &
          History_Track1_plot, History_Track2_plot, History_Track3_plot, &
          History_Track4_plot, History_Track5_plot, History_Track6_plot, &
          History_Track7_plot, History_Track8_plot, History_Track9_plot
-      use pgbinary_star, only :&
+      use pgbinary_star, only: &
          Star1_plot, Star2_plot
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
@@ -1033,7 +1033,7 @@ contains
 
 
       subroutine get_hist_values(num, ierr)
-         use binary_history, only :do_get_data_for_binary_history_columns
+         use binary_history, only: do_get_data_for_binary_history_columns
          integer, intent(in) :: num
          integer, intent(out) :: ierr
          integer :: i

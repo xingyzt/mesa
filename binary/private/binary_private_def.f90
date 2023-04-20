@@ -211,7 +211,7 @@ contains
 
    subroutine binary_private_def_init
       use num_def
-      use utils_lib, only :get_compiler_version, get_mesasdk_version
+      use utils_lib, only: get_compiler_version, get_mesasdk_version
 
       integer :: i
       logical :: okay

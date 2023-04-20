@@ -67,7 +67,7 @@ contains
 
 
    integer function how_many_extra_binary_history_header_items(binary_id)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       integer, intent(in) :: binary_id
       how_many_extra_binary_history_header_items = 0
    end function how_many_extra_binary_history_header_items
@@ -90,7 +90,7 @@ contains
 
 
    integer function how_many_extra_binary_history_columns(binary_id)
-      use binary_def, only :binary_info
+      use binary_def, only: binary_info
       integer, intent(in) :: binary_id
       how_many_extra_binary_history_columns = 0
    end function how_many_extra_binary_history_columns

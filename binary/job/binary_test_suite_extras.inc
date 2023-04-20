@@ -1,5 +1,5 @@
 subroutine test_suite_testhub_start(b, ierr)
-   use binary_def, only :binary_info
+   use binary_def, only: binary_info
    type (binary_info), pointer :: b
    integer, intent(out) :: ierr
 
@@ -14,7 +14,7 @@ end subroutine test_suite_testhub_start
 
 
 subroutine test_suite_testhub_end(b, ierr)
-   use binary_def, only :binary_info
+   use binary_def, only: binary_info
    type (binary_info), pointer :: b
    integer, intent(out) :: ierr
 
@@ -102,7 +102,7 @@ end subroutine write_testhub_extras
 
 
 subroutine test_suite_startup(b, restart, ierr)
-   use binary_def, only :binary_info
+   use binary_def, only: binary_info
    type (binary_info), pointer :: b
    logical, intent(in) :: restart
    integer, intent(out) :: ierr
@@ -116,7 +116,7 @@ end subroutine test_suite_startup
 
 
 subroutine test_suite_after_evolve(b, ierr)
-   use binary_def, only :binary_info
+   use binary_def, only: binary_info
    type (binary_info), pointer :: b
    integer, intent(out) :: ierr
    ierr = 0

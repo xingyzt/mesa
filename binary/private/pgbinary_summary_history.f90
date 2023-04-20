@@ -65,7 +65,7 @@ contains
       use utils_lib
       use chem_def
       use net_def
-      use const_def, only :Msun, Rsun
+      use const_def, only: Msun, Rsun
 
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id

@@ -54,20 +54,20 @@ module binary_def
    abstract interface
 
       subroutine other_rlo_mdot_interface(binary_id, rlo_mdot, ierr)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: rlo_mdot
          integer, intent(out) :: ierr
       end subroutine other_rlo_mdot_interface
 
       integer function other_check_implicit_rlo_interface(binary_id, new_mdot)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: new_mdot
       end function other_check_implicit_rlo_interface
 
       subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, detachment, ierr)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: function_to_solve
          logical, intent(out) :: use_sum, detachment
@@ -75,7 +75,7 @@ module binary_def
       end subroutine other_implicit_function_to_solve_interface
 
       subroutine other_tsync_interface(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
-         use const_def, only :dp, strlen
+         use const_def, only: dp, strlen
          integer, intent(in) :: id
          character (len = strlen), intent(in) :: sync_type
          real(dp), intent(in) :: Ftid
@@ -88,7 +88,7 @@ module binary_def
       end subroutine other_tsync_interface
 
       subroutine other_sync_spin_to_orbit_interface(id, nz, osep, qratio, rl, dt_next, Ftid, sync_type, sync_mode, ierr)
-         use const_def, only :dp, strlen
+         use const_def, only: dp, strlen
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: osep
@@ -102,7 +102,7 @@ module binary_def
       end subroutine other_sync_spin_to_orbit_interface
 
       subroutine other_mdot_edd_interface(binary_id, mdot_edd, mdot_edd_eta, ierr)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: mdot_edd
          real(dp), intent(out) :: mdot_edd_eta
@@ -141,7 +141,7 @@ module binary_def
       end subroutine other_CE_init_interface
 
       subroutine other_CE_rlo_mdot_interface(binary_id, rlo_mdot, ierr)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: rlo_mdot
          integer, intent(out) :: ierr
@@ -189,7 +189,7 @@ module binary_def
       end subroutine other_binary_photo_read_interface
 
       subroutine other_e2_interface(id, e2, ierr)
-         use const_def, only :dp
+         use const_def, only: dp
          integer, intent(in) :: id
          real(dp), intent (out) :: e2
          integer, intent(out) :: ierr

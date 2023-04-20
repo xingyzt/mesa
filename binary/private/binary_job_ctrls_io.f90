@@ -25,7 +25,7 @@
 
 module binary_job_ctrls_io
 
-   use const_def, only :dp
+   use const_def, only: dp
    use binary_def
 
    implicit none
@@ -268,7 +268,7 @@ contains
 
 
    subroutine get_binary_job(b, name, val, ierr)
-      use utils_lib, only :StrUpCase
+      use utils_lib, only: StrUpCase
       type (binary_info), pointer :: b
       character(len = *), intent(in) :: name
       character(len = *), intent(out) :: val

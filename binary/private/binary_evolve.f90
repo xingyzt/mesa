@@ -31,7 +31,7 @@ module binary_evolve
    use star_lib
    use star_def
    use binary_def
-   use binary_utils, only :eval_rlobe, set_angular_momentum_j, &
+   use binary_utils, only: eval_rlobe, set_angular_momentum_j, &
       set_separation_eccentricity, set_period_eccentricity
 
    implicit none
@@ -39,7 +39,7 @@ module binary_evolve
 contains
 
    subroutine binarydata_init(b, doing_restart)
-      use utils_lib, only :is_bad
+      use utils_lib, only: is_bad
       type (binary_info), pointer :: b
       logical, intent(in) :: doing_restart
       integer :: finish_step_result
@@ -261,9 +261,9 @@ contains
    end subroutine
 
    integer function binary_evolve_step(b)
-      use utils_lib, only :is_bad
-      use binary_jdot, only :get_jdot
-      use binary_edot, only :get_edot
+      use utils_lib, only: is_bad
+      use binary_jdot, only: get_jdot
+      use binary_edot, only: get_edot
       type(binary_info), pointer :: b
       integer :: i
 
@@ -396,7 +396,7 @@ contains
    end function binary_evolve_step
 
    integer function binary_check_model(b)
-      use binary_mdot, only :rlo_mdot, check_implicit_rlo
+      use binary_mdot, only: rlo_mdot, check_implicit_rlo
       use binary_irradiation
       type (binary_info), pointer :: b
 

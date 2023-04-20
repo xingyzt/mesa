@@ -37,9 +37,9 @@ contains
       ierr, &
       inlist_fname_arg)
 
-      use run_binary_support, only :do_run1_binary
-      use binary_def, only :init_binary_data
-      use star_def, only :star_info
+      use run_binary_support, only: do_run1_binary
+      use binary_def, only: init_binary_data
+      use star_def, only: star_info
 
       logical, intent(in) :: tst
 
@@ -74,7 +74,7 @@ contains
    end subroutine run1_binary
 
    subroutine binary_set_ignore_rlof_flag(binary_id, ignore_rlof_flag, ierr)
-      use binary_utils, only :set_ignore_rlof_flag
+      use binary_utils, only: set_ignore_rlof_flag
       integer, intent(in) :: binary_id
       logical, intent(in) :: ignore_rlof_flag
       integer, intent(out) :: ierr
@@ -84,7 +84,7 @@ contains
    end subroutine binary_set_ignore_rlof_flag
 
    subroutine binary_set_point_mass_i(binary_id, point_mass_i, ierr)
-      use binary_utils, only :set_point_mass_i
+      use binary_utils, only: set_point_mass_i
       integer, intent(in) :: binary_id
       integer, intent(in) :: point_mass_i
       integer, intent(out) :: ierr
@@ -94,7 +94,7 @@ contains
    end subroutine binary_set_point_mass_i
 
    subroutine binary_set_m1(binary_id, m1, ierr)
-      use binary_utils, only :set_m1
+      use binary_utils, only: set_m1
       integer, intent(in) :: binary_id
       real(dp), intent(in) :: m1
       integer, intent(out) :: ierr
@@ -104,7 +104,7 @@ contains
    end subroutine binary_set_m1
 
    subroutine binary_set_m2(binary_id, m2, ierr)
-      use binary_utils, only :set_m2
+      use binary_utils, only: set_m2
       integer, intent(in) :: binary_id
       real(dp), intent(in) :: m2
       integer, intent(out) :: ierr
@@ -114,7 +114,7 @@ contains
    end subroutine binary_set_m2
 
    subroutine binary_set_period_eccentricity(binary_id, period, eccentricity, ierr)
-      use binary_utils, only :set_period_eccentricity
+      use binary_utils, only: set_period_eccentricity
       integer, intent(in) :: binary_id
       real(dp), intent(in) :: period ! in seconds
       real(dp), intent(in) :: eccentricity
@@ -123,7 +123,7 @@ contains
    end subroutine binary_set_period_eccentricity
 
    subroutine binary_set_separation_eccentricity(binary_id, separation, eccentricity, ierr)
-      use binary_utils, only :set_separation_eccentricity
+      use binary_utils, only: set_separation_eccentricity
       integer, intent(in) :: binary_id
       real(dp), intent(in) :: separation ! in cm
       real(dp), intent(in) :: eccentricity
@@ -133,7 +133,7 @@ contains
    end subroutine binary_set_separation_eccentricity
 
    real(dp) function binary_eval_rlobe(m1, m2, a)
-      use binary_utils, only :eval_rlobe
+      use binary_utils, only: eval_rlobe
       real(dp), intent(in) :: m1, m2, a
       ! Roche lobe size for star of mass m1 with a
       ! companion of mass m2 at separation a, according to
@@ -142,7 +142,7 @@ contains
    end function binary_eval_rlobe
 
    subroutine binary_eval_mdot_edd(binary_id, mdot_edd, mdot_edd_eta, ierr)
-      use binary_mdot, only :eval_mdot_edd
+      use binary_mdot, only: eval_mdot_edd
       integer, intent(in) :: binary_id
       integer, intent(out) :: ierr
       real(dp), intent(out) :: mdot_edd, mdot_edd_eta
@@ -150,14 +150,14 @@ contains
    end subroutine binary_eval_mdot_edd
 
    subroutine binary_eval_accreted_material_j(binary_id, ierr)
-      use binary_mdot, only :eval_accreted_material_j
+      use binary_mdot, only: eval_accreted_material_j
       integer, intent(in) :: binary_id
       integer, intent(out) :: ierr
       call eval_accreted_material_j(binary_id, ierr)
    end subroutine binary_eval_accreted_material_j
 
    subroutine binary_eval_wind_xfer_fractions(binary_id, ierr)
-      use binary_wind, only :eval_wind_xfer_fractions
+      use binary_wind, only: eval_wind_xfer_fractions
       integer, intent(in) :: binary_id
       integer, intent(out) :: ierr
       call eval_wind_xfer_fractions(binary_id, ierr)
@@ -165,8 +165,8 @@ contains
 
 
    subroutine binary_get_control_namelist(binary_id, name, val, ierr)
-      use binary_ctrls_io, only :get_binary_control
-      use binary_def, only :binary_info, binary_ptr
+      use binary_ctrls_io, only: get_binary_control
+      use binary_def, only: binary_info, binary_ptr
       integer, intent(in) :: binary_id
       character(len = *), intent(in) :: name
       character(len = *), intent(out) :: val
@@ -181,8 +181,8 @@ contains
    end subroutine binary_get_control_namelist
 
    subroutine binary_set_control_namelist(binary_id, name, val, ierr)
-      use binary_ctrls_io, only :set_binary_control
-      use binary_def, only :binary_info, binary_ptr
+      use binary_ctrls_io, only: set_binary_control
+      use binary_def, only: binary_info, binary_ptr
       integer, intent(in) :: binary_id
       character(len = *), intent(in) :: name
       character(len = *), intent(in) :: val
@@ -198,8 +198,8 @@ contains
 
 
    subroutine binary_get_star_job_namelist(binary_id, name, val, ierr)
-      use binary_job_ctrls_io, only :get_binary_job
-      use binary_def, only :binary_info, binary_ptr
+      use binary_job_ctrls_io, only: get_binary_job
+      use binary_def, only: binary_info, binary_ptr
       integer, intent(in) :: binary_id
       character(len = *), intent(in) :: name
       character(len = *), intent(out) :: val
@@ -214,8 +214,8 @@ contains
    end subroutine binary_get_star_job_namelist
 
    subroutine binary_set_star_job_namelist(binary_id, name, val, ierr)
-      use binary_job_ctrls_io, only :set_binary_job
-      use binary_def, only :binary_info, binary_ptr
+      use binary_job_ctrls_io, only: set_binary_job
+      use binary_def, only: binary_info, binary_ptr
       integer, intent(in) :: binary_id
       character(len = *), intent(in) :: name
       character(len = *), intent(in) :: val

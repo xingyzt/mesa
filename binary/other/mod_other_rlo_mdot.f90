@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module mod_other_rlo_mdot
-   use binary_def, only :binary_info, binary_ptr
+   use binary_def, only: binary_info, binary_ptr
 
    ! NOTE: remember to set true:
    ! use_other_rlo_mdot = .true.
@@ -112,7 +112,7 @@ module mod_other_rlo_mdot
 contains
 
    subroutine null_other_rlo_mdot(binary_id, mdot, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       real(dp), intent(out) :: mdot
       integer, intent(out) :: ierr

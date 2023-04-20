@@ -29,8 +29,8 @@ module pgbinary_lib
 contains
 
    subroutine create_pgbinary_file_name(b, dir, prefix, name)
-      use pgbinary, only :do_create_file_name
-      use binary_def, only :binary_info
+      use pgbinary, only: do_create_file_name
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
@@ -39,8 +39,8 @@ contains
 
 
    subroutine pgbinary_write_plot_to_file(b, p, filename, ierr)
-      use binary_def, only :pgbinary_win_file_data, binary_info
-      use pgbinary, only :do_write_plot_to_file
+      use binary_def, only: pgbinary_win_file_data, binary_info
+      use pgbinary, only: do_write_plot_to_file
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
@@ -51,8 +51,8 @@ contains
 
    subroutine show_pgbinary_annotations(&
       b, show_annotation1, show_annotation2, show_annotation3)
-      use pgbinary, only :do_show_pgbinary_annotations
-      use binary_def, only :binary_info
+      use pgbinary, only: do_show_pgbinary_annotations
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       logical, intent(in) :: &
          show_annotation1, show_annotation2, show_annotation3
@@ -62,8 +62,8 @@ contains
 
 
    subroutine pgbinary_show_box(b, str1, str2)
-      use pgbinary, only :show_box_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_box_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: str1, str2
       call show_box_pgbinary(b, str1, str2)
@@ -71,8 +71,8 @@ contains
 
 
    subroutine pgbinary_show_title(b, title, pad)
-      use pgbinary, only :show_title_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_title_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: title
       real, intent(in) :: pad
@@ -85,8 +85,8 @@ contains
 
 
    subroutine pgbinary_show_xaxis_label(b, label, pad)
-      use pgbinary, only :show_xaxis_label_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_xaxis_label_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: label
       real, intent(in) :: pad
@@ -99,8 +99,8 @@ contains
 
 
    subroutine pgbinary_show_left_yaxis_label(b, label, pad)
-      use pgbinary, only :show_left_yaxis_label_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_left_yaxis_label_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: label
       real, intent(in) :: pad
@@ -113,8 +113,8 @@ contains
 
 
    subroutine pgbinary_show_right_yaxis_label(b, label, pad)
-      use pgbinary, only :show_right_yaxis_label_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_right_yaxis_label_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: label
       real, intent(in) :: pad
@@ -128,8 +128,8 @@ contains
 
    subroutine pgbinary_show_left_axis_label_pgmtxt(&
       b, coord, fjust, label, pad)
-      use pgbinary, only :show_left_yaxis_label_pgmtxt_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_left_yaxis_label_pgmtxt_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: label
       real, intent(in) :: pad, coord, fjust
@@ -144,8 +144,8 @@ contains
 
    subroutine pgbinary_show_right_axis_label_pgmtxt(&
       b, coord, fjust, label, pad)
-      use pgbinary, only :show_right_yaxis_label_pgmtxt_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_right_yaxis_label_pgmtxt_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       character (len = *), intent(in) :: label
       real, intent(in) :: pad, coord, fjust
@@ -159,24 +159,24 @@ contains
 
 
    subroutine pgbinary_show_model_number(b)
-      use pgbinary, only :show_model_number_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_model_number_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       call show_model_number_pgbinary(b)
    end subroutine pgbinary_show_model_number
 
 
    subroutine pgbinary_show_age(b)
-      use pgbinary, only :show_age_pgbinary
-      use binary_def, only :binary_info
+      use pgbinary, only: show_age_pgbinary
+      use binary_def, only: binary_info
       type (binary_info), pointer :: b
       call show_age_pgbinary(b)
    end subroutine pgbinary_show_age
 
 
    subroutine binary_shutdown_pgbinary(id, ierr)
-      use pgbinary, only :shutdown_pgbinary
-      use binary_def, only :binary_info, binary_ptr
+      use pgbinary, only: shutdown_pgbinary
+      use binary_def, only: binary_info, binary_ptr
       integer, intent(in) :: id ! id for star
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b

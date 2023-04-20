@@ -31,17 +31,17 @@ module binary_ce
    use star_lib
    use star_def
    use binary_def
-   use interp_1d_def, only :pm_work_size
-   use interp_1d_lib, only :interp_pm, interp_values, interp_value
+   use interp_1d_def, only: pm_work_size
+   use interp_1d_lib, only: interp_pm, interp_values, interp_value
 
    implicit none
 
 contains
 
    subroutine CE_init(b, restart, ierr)
-      use chem_def, only :chem_isos
-      use interp_1d_def, only :pm_work_size
-      use interp_1d_lib, only :interp_pm
+      use chem_def, only: chem_isos
+      use interp_1d_def, only: pm_work_size
+      use interp_1d_lib, only: interp_pm
       type (binary_info), pointer :: b
       logical, intent(in) :: restart
       integer, intent(out) :: ierr
@@ -205,7 +205,7 @@ contains
    end subroutine
 
    subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
-      use const_def, only :dp
+      use const_def, only: dp
       integer, intent(in) :: binary_id
       real(dp), intent(out) :: rlo_mdot
       integer, intent(out) :: ierr
@@ -235,7 +235,7 @@ contains
    end subroutine CE_rlo_mdot
 
    integer function CE_binary_evolve_step(b)
-      use binary_utils, only :set_separation_eccentricity
+      use binary_utils, only: set_separation_eccentricity
       type (binary_info), pointer :: b
       type (star_info), pointer :: s
       real(dp) :: Ebind, Ecore, Ecore_i, lambda, &
@@ -336,7 +336,7 @@ contains
    end function CE_binary_evolve_step
 
    integer function CE_binary_finish_step(b)
-      use binary_utils, only :eval_rlobe
+      use binary_utils, only: eval_rlobe
       type (binary_info), pointer :: b
       real(dp) :: h_diff, he_diff, rlobe
       logical :: terminate_CE

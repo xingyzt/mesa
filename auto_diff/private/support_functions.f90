@@ -35,12 +35,12 @@ contains
       end if
    end function sgn
 
-   pure real(dp) function Heaviside(x) result(res)
-      real(dp), intent(in) :: x
+   pure real(dp) function Heaviside(x, h0) result(res)
+      real(dp), intent(in) :: x, h0
       if (x < 0d0) then
          res = 0d0
       else if (x == 0d0) then
-         res = 0.5d0
+         res = h0
       else
          res = 1d0
       end if

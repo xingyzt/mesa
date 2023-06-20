@@ -110,7 +110,6 @@
          unstable(:,1:nz) = .false.
          growth_limit = 1d-10
 
-!$OMP PARALLEL DO PRIVATE(which, k, q, age_fraction, op_err) SCHEDULE(dynamic,2)
          do which = 1, num_instabilities
 
             if (ierr /= 0) cycle
@@ -258,7 +257,6 @@
             end select
 
          end do
-!$OMP END PARALLEL DO
          if (failed('set_rotation_mixing_info instabilities', ierr)) return
          
          if (s% D_omega_flag .and. s% doing_finish_load_model) then

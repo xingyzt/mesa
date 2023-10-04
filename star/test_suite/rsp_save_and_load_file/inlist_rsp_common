@@ -299,8 +299,8 @@
       eps_nuc_factor = 0d0
       
 ! opacity controls
-      !cubic_interpolation_in_X = .false.
-      !cubic_interpolation_in_Z = .false.
+      !cubic_interpolation_in_X = .true.
+      !cubic_interpolation_in_Z = .true.
       !include_electron_conduction = .true.
       !use_Zbase_for_Type1_blend = .true.
       !use_Type2_opacities = .false.

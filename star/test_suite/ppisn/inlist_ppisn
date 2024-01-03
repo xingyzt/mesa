@@ -22,6 +22,10 @@
 
    timescale_for_relax_composition = 1d5
 
+   ! One or both of the following settings may help with Pre MS failures
+   pre_ms_d_log10_P = 1d-2 ! if not set, code uses 4d-3
+   ! pre_ms_T_c = 7d5
+
    !change_initial_net = .true.
    !although not used, run_star_extras reads new_net_name during pulses
    new_net_name = "approx21_plus_co56.net"

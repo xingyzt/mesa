@@ -382,6 +382,7 @@
          use eos_def
          use kap_lib
          use chem_lib
+         use utils_lib, only: is_bad
          use eos_lib, only: Radiation_Pressure
          use eos_support, only: get_eos, solve_eos_given_PgasT_auto
          use star_utils, only: normalize_dqs, set_qs, &
@@ -465,7 +466,7 @@
          lnT = log(T_c) - &
             pow(pi/6,one_third)*cgrav*grada*pow(rho_c*rho_c*m,two_thirds)/P_c
          T = exp(lnT)
-         
+
          ! density at nz
          call solve_eos_given_PgasT_auto( &
               s, 0, xa, &
@@ -483,7 +484,7 @@
          do
          
             L = eps_grav*m ! L at nz
-         
+
             ! check for convective core
             call eval_gradT( &
                s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
@@ -561,6 +562,31 @@
                   end do
                   
                   L = L0 + dm*eps_grav ! luminosity at point k
+
+                  ! check whether we got a sensible answer for L and dm
+                  if(is_bad(L)) then
+                     write(*,*)
+                     write(*,1) "bad L in build1_pre_ms_model", L
+                     write(*,1) "L0", L0
+                     write(*,1) "dm", dm
+                     write(*,1) "eps_grav", eps_grav
+                     if(dbg) then
+                        write(*,2) "k", k
+                        write(*,1) "r", r
+                        write(*,1) "P", P
+                        write(*,1) "P0", P0
+                        write(*,1) "logPgas", logPgas
+                        write(*,1) "logPgas0", logPgas0
+                     end if
+                     write(*,*)
+                     write(*,*) "May want to try setting other values for one or both of"
+                     write(*,1) "pre_ms_d_log10_P", dlogPgas
+                     write(*,1) "pre_ms_T_c", T_c
+                     write(*,*)
+                     ierr = -1
+                     return
+                  end if
+
                   Lmid = (L0+L)/2
                   
                   Pmid = (P+P0)/2
@@ -737,7 +763,7 @@
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
-  
+
       end subroutine eval_gradT
 
 

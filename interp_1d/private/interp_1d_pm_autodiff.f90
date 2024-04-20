@@ -1,10 +1,6 @@
 ! ***********************************************************************
 !
-<<<<<<< HEAD
 !   Copyright (C) 2024  The MESA Team
-=======
-!   Copyright (C) 2010  The MESA Team
->>>>>>> kap_derivative_testing
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

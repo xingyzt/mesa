@@ -33,12 +33,12 @@ ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
 cmap = copy.copy(mpl.cm.get_cmap("coolwarm"))
-cmap.set_over('white')
+cmap.set_over('tab:red')
 cmap.set_under('black')
 
 # set color bar limits
 # None will auto-set limits
-cbar_min = -16
+cbar_min = -14
 cbar_max = 2
 
 pcol = ax.pcolormesh(Xran, Yran, kapDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)

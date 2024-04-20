@@ -1,6 +1,10 @@
 ! ***********************************************************************
 !
+<<<<<<< HEAD
 !   Copyright (C) 2024  The MESA Team
+=======
+!   Copyright (C) 2010  The MESA Team
+>>>>>>> kap_derivative_testing
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -39,7 +43,7 @@
       ! This autodiff version also propagates the proper derivatives wrt var1 and var2
       ! through the interpolation as long as good derivatives are passed in for the
       ! interpolated quantities.
-      
+      ! the downside is reduced accuracy on smooth data compared to the mp routines.
       subroutine mk_pmcub_autodiff(x, nx, f1, slope_only, nwork, work1, str, ierr)
          ! make piecewise monotonic cubic interpolant
          use interp_1d_def
@@ -92,13 +96,17 @@
          s(1:nx) => work1(1+nx:2*nx)
          p(1:nx) => work1(1+2*nx:3*nx)
          
-         if (dbg) then
-            do i = 1,nx
-               h(i) = 0d0
-               s(i) = 0d0
-               p(i) = 0d0
-            end do
-         end if
+!         if (dbg) then
+!            do i = 1,nx
+!               h(i) = 0d0
+!               s(i) = 0d0
+!               p(i) = 0d0
+!            end do
+!         end if
+
+         !if (dbg) then
+         !   h(:) = 0; s(:) = 0; p(:) = 0
+         !end if
          
          do i=1,nx-1
             h(i) = x(i+1) - x(i) ! width of interval

@@ -30,7 +30,7 @@
       set_initial_age = .true.
       initial_age = 0
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -75,7 +75,7 @@
       
       mass_change = 1d-9 ! Msun/year
       
-      mesh_delta_coeff = 0.5
+      mesh_delta_coeff = 0.4
 
       energy_eqn_option = 'eps_grav'
       max_abs_rel_run_E_err = 1d99
@@ -118,8 +118,8 @@
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .false. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !report_solver_progress = .false. ! set true to see info about solver iterations
+      !report_ierr = .false. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
       !fill_arrays_with_NaNs = .true.

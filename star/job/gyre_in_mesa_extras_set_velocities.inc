@@ -10,7 +10,7 @@
       subroutine gyre_in_mesa_extras_set_velocities(s,restart,ierr)
          use const_def
          use math_lib
-         use gyre_lib
+         use gyre_mesa_m
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interpolate_vector_pm
          type (star_info), pointer :: s
@@ -74,7 +74,7 @@
          end if
 
          !write(*,*) 'call gyre_set_model'
-         call gyre_set_model(global_data, point_data, 101)
+         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
 
           write(*, 100) 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)', 'growth', 'cycles to double'

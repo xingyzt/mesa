@@ -43,7 +43,7 @@ We also have to choose a network of nuclear reactions. This network should be ch
 Here we want to use a nuclear reactions network, called ``pp_and_cno_extras.net``, which provides a more complete coverage for hydrogen and helium burning.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  kappa_file_prefix = 'a09'
+   :start-after:  kap_file_prefix = 'a09'
    :end-before: /
 
 We do not specify anything about the eos, which means we use the default one.
